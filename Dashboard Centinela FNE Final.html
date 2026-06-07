@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vigilancia Epidemiológica | Unidades Centinela FNE 2022–2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal:#006778;--teal-d:#004d5c;--teal-l:#e8f5f7;--teal-m:#b2dde4;
+  --accent:#00a3b5;--gold:#c4920e;--red:#b83232;--green:#2e7d5b;
+  --grey1:#f5f8f9;--grey2:#dce9eb;--grey3:#7fa8b0;
+  --text:#1a2e32;--text2:#3d5c62;--white:#fff;
+  --sh:0 2px 10px rgba(0,103,120,.10);--shl:0 4px 20px rgba(0,103,120,.14);
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff;color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--teal);height:58px;display:flex;align-items:center;
+  padding:0 24px;gap:14px;position:sticky;top:0;z-index:300;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.hdr-logo{display:flex;align-items:center;gap:8px;border-right:1px solid rgba(255,255,255,.25);padding-right:14px;}
+.hdr-logo span{font-size:22px;}
+.hdr-titles h1{font-size:13px;font-weight:700;color:#fff;letter-spacing:.2px;}
+.hdr-titles p{font-size:10px;color:rgba(255,255,255,.7);margin-top:1px;}
+.hdr-badge{margin-left:auto;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;padding:3px 12px;font-size:10px;color:#fff;font-weight:600;}
+.flag{display:flex;gap:2px;margin-left:10px;}
+.fb{width:16px;height:4px;border-radius:1px;}
+
+/* NAV */
+.nav{background:#fff;border-bottom:2px solid var(--grey2);padding:0 24px;
+  display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.nav::-webkit-scrollbar{display:none;}
+.tb{padding:11px 16px;border:none;background:transparent;cursor:pointer;
+  font-size:12px;font-weight:600;color:var(--grey3);border-bottom:3px solid transparent;
+  margin-bottom:-2px;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.tb:hover{color:var(--teal);}
+.tb.on{color:var(--teal);border-bottom-color:var(--teal);}
+.ti{font-size:14px;}
+
+/* FILTER BAR */
+.fb-bar{background:var(--teal-l);border-bottom:1px solid var(--teal-m);
+  padding:8px 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.fb-bar label{font-size:10px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.5px;}
+.fsel{padding:5px 10px;border:1px solid var(--teal-m);border-radius:6px;
+  font-size:11px;color:var(--text);background:#fff;cursor:pointer;min-width:120px;}
+.fsel:focus{outline:none;border-color:var(--teal);}
+.fg{display:flex;align-items:center;gap:5px;}
+.btn-rst{background:var(--teal);color:#fff;border:none;border-radius:6px;
+  padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;margin-left:auto;}
+.btn-rst:hover{background:var(--teal-d);}
+
+/* PAGE */
+.pg{display:none;padding:20px 24px 40px;max-width:1400px;margin:0 auto;}
+.pg.on{display:block;}
+
+/* KPI ROW */
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+.kcard{background:#fff;border-radius:var(--r);padding:16px 18px;
+  box-shadow:var(--sh);border-left:4px solid var(--teal);
+  display:flex;flex-direction:column;gap:4px;transition:transform .2s;}
+.kcard:hover{transform:translateY(-2px);box-shadow:var(--shl);}
+.kcard.gold{border-left-color:var(--gold);}
+.kcard.red{border-left-color:var(--red);}
+.kcard.grn{border-left-color:var(--green);}
+.kcard.dk{border-left-color:var(--teal-d);}
+.knum{font-size:28px;font-weight:800;color:var(--teal);line-height:1;}
+.knum.gold{color:var(--gold);}.knum.red{color:var(--red);}.knum.grn{color:var(--green);}
+.klbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;}
+.ksub{font-size:10px;color:var(--grey3);}
+
+/* SECTION TITLE */
+.stitle{font-size:12px;font-weight:700;color:var(--teal-d);text-transform:uppercase;
+  letter-spacing:.5px;margin:22px 0 12px;padding-bottom:7px;
+  border-bottom:1px solid var(--grey2);display:flex;align-items:center;gap:7px;}
+.stitle .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+
+/* CHART GRIDS */
+.cg{display:grid;gap:16px;margin-bottom:18px;}
+.cg2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));}
+.cg3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+.cg1{grid-template-columns:1fr;}
+
+/* CHART CARD */
+.cc{background:#fff;border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh);}
+.cc h3{font-size:11px;font-weight:700;color:var(--teal-d);text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.cc h3 .ico{font-size:14px;}
+.cw{position:relative;height:230px;}
+.cw.t{height:300px;}
+.cw.s{height:160px;}
+.cw.xs{height:120px;}
+
+/* ALERT */
+.alert{background:#fff8e1;border:1px solid #f0c040;border-radius:8px;
+  padding:12px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start;font-size:12px;}
+.alert .ico{font-size:16px;flex-shrink:0;}
+.alert p{color:#5c4000;line-height:1.5;}
+.alert strong{color:#3d2a00;}
+
+/* BADGE GRID */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.bcrd{background:var(--teal-l);border-radius:8px;padding:12px 16px;border-left:4px solid var(--teal);}
+.bcrd.red{background:#fff0f0;border-left-color:var(--red);}
+.bcrd.gold{background:#fffbf0;border-left-color:var(--gold);}
+.bcrd.grn{background:#f0fff7;border-left-color:var(--green);}
+.bnum{font-size:22px;font-weight:800;color:var(--teal);}
+.bnum.red{color:var(--red);}.bnum.gold{color:var(--gold);}.bnum.grn{color:var(--green);}
+.blbl{font-size:10px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.3px;margin-top:2px;}
+.bdsc{font-size:10px;color:var(--text2);margin-top:3px;line-height:1.4;}
+
+/* PROGRESS BARS */
+.pr{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;}
+.prl{width:150px;flex-shrink:0;color:var(--text2);font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prw{flex:1;background:var(--grey2);border-radius:4px;height:9px;overflow:hidden;}
+.prf{height:100%;border-radius:4px;background:var(--teal);transition:width .5s;}
+.prv{width:46px;text-align:right;color:var(--text);font-weight:700;font-size:11px;}
+
+/* CLASIF BADGES */
+.clasif-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.clasif-badge{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:2px solid transparent;}
+.clasif-badge.monopolio{background:#fff0f0;color:#8b0000;border-color:#c0392b;}
+.clasif-badge.control{background:#f3e5f5;color:#4a148c;border-color:#7b1fa2;}
+.clasif-badge.fiscal{background:#fff8e1;color:#e65100;border-color:#e07b39;}
+.clasif-badge.active{transform:scale(1.05);box-shadow:0 2px 8px rgba(0,0,0,.15);}
+
+/* TABLE */
+.dtbl{width:100%;border-collapse:collapse;font-size:11px;}
+.dtbl th{background:var(--teal);color:#fff;padding:8px 10px;text-align:left;font-weight:600;}
+.dtbl td{padding:7px 10px;border-bottom:1px solid var(--grey1);}
+.dtbl tr:nth-child(even) td{background:var(--grey1);}
+.dtbl tr:hover td{background:var(--teal-l);}
+
+/* MAP */
+.map-wrap{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-bottom:18px;}
+.mcv{background:var(--grey1);border-radius:var(--r);overflow:hidden;}
+
+/* TOOLTIP */
+.tt{position:fixed;background:rgba(0,0,0,.85);color:#fff;padding:8px 12px;
+  border-radius:6px;font-size:11px;pointer-events:none;z-index:1000;
+  max-width:220px;line-height:1.5;display:none;}
+
+/* FOOTER */
+footer{background:var(--teal-l);border-top:1px solid var(--teal-m);
+  padding:12px 24px;text-align:center;font-size:10px;color:var(--text2);}
+
+@media(max-width:700px){.pg{padding:14px;}.map-wrap{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="tt" id="tooltip"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <span>⚕</span>
+    <div class="hdr-titles">
+      <h1>FONDO NACIONAL DE ESTUPEFACIENTES</h1>
+      <p>Ministerio de Salud y Protección Social — Colombia</p>
+    </div>
+  </div>
+  <div class="hdr-badge">🔬 Unidades Centinela 2022–2026</div>
+  <div class="flag">
+    <div class="fb" style="background:#FFD100;"></div>
+    <div class="fb" style="background:#003087;"></div>
+    <div class="fb" style="background:#CE1126;"></div>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="nav">
+  <button class="tb on"  onclick="tab('resumen',this)"><span class="ti">📊</span>Resumen</button>
+  <button class="tb" onclick="tab('medicamentos',this)"><span class="ti">💊</span>Medicamentos Reportados</button>
+  <button class="tb" onclick="tab('patron',this)"><span class="ti">🔗</span>Patrón de Consumo</button>
+  <button class="tb" onclick="tab('obtencion',this)"><span class="ti">🔍</span>Obtención & IVC</button>
+  <button class="tb" onclick="tab('perfil',this)"><span class="ti">👤</span>Perfil del Paciente</button>
+  <button class="tb" onclick="tab('cobertura',this)"><span class="ti">🏥</span>Cobertura</button>
+  <button class="tb" onclick="tab('infografia',this)"><span class="ti">📋</span>Hoja de Ruta FRE</button>
+</nav>
+
+<!-- FILTERS -->
+<div class="fb-bar">
+  <div class="fg"><label>Año</label>
+    <select class="fsel" id="fy" onchange="render()">
+      <option value="all">Todos (2022–2026)</option>
+      <option>2022</option><option>2023</option><option>2024</option>
+      <option>2025</option><option>2026</option>
+    </select>
+  </div>
+  <div class="fg"><label>Departamento</label>
+    <select class="fsel" id="fd" onchange="render()">
+      <option value="all">Todos</option>
+    </select>
+  </div>
+  <div class="fg"><label>Grupo farmacológico</label>
+    <select class="fsel" id="fg" onchange="render()">
+      <option value="all">Todos</option>
+    </select>
+  </div>
+  <div class="fg"><label>Clasificación Colombia</label>
+    <select class="fsel" id="fc" onchange="render()">
+      <option value="all">Todas</option>
+      <option>Control Especial</option>
+      <option>Monopolio del Estado</option>
+      <option>Sustancia Fiscalizada</option>
+    </select>
+  </div>
+  <button class="btn-rst" onclick="rst()">↺ Restablecer</button>
+</div>
+
+<!-- ═══════════════ PÁGINA 1: RESUMEN ═══════════════════════════════ -->
+<div class="pg on" id="p-resumen">
+  <div class="krow">
+    <div class="kcard"><div class="knum" id="k0">2.296</div><div class="klbl">Total casos</div><div class="ksub">2022–2026</div></div>
+    <div class="kcard gold"><div class="knum gold" id="k1">1.749</div><div class="klbl">Control Especial</div><div class="ksub">clasificación Colombia</div></div>
+    <div class="kcard red"><div class="knum red" id="k2">222</div><div class="klbl">Monopolio del Estado</div><div class="ksub">opioides y otros</div></div>
+    <div class="kcard grn"><div class="knum grn" id="k3">59.8%</div><div class="klbl">Mercado ilegal</div><div class="ksub">vía de obtención</div></div>
+    <div class="kcard dk"><div class="knum" id="k4">84.6%</div><div class="klbl">Fácil conseguir</div><div class="ksub">accesibilidad al medicamento</div></div>
+    <div class="kcard"><div class="knum" id="k5">27</div><div class="klbl">Instituciones</div><div class="ksub">unidades centinela</div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Clasificación Colombia — Distribución</div>
+  <div class="cg cg3">
+    <div class="cc"><h3><span class="ico">🏷️</span>Medicamentos por clasificación Colombia</h3>
+      <div class="cw s"><canvas id="c-clasif-pie"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">📈</span>Clasificación por año</h3>
+      <div class="cw s"><canvas id="c-clasif-year"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🧬</span>Grupos farmacológicos</h3>
+      <div class="cw s"><canvas id="c-grupo-pie"></canvas></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Tendencia de Notificación</div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">📅</span>Casos por año</h3>
+      <div class="cw"><canvas id="c-year"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🗺️</span>Casos por departamento (top 10)</h3>
+      <div class="cw" id="depto-prog"></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Mapa de Distribución Geográfica</div>
+  <div class="map-wrap">
+    <div class="cc mcv"><h3><span class="ico">📍</span>Burbujas por departamento (tamaño = casos)</h3>
+      <canvas id="c-map" width="680" height="380"></canvas></div>
+    <div class="cc"><h3><span class="ico">⚡</span>Hallazgos clave</h3>
+      <div id="hallazgos"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ PÁGINA 2: MEDICAMENTOS REPORTADOS ════════════════ -->
+<div class="pg" id="p-medicamentos">
+  <div class="alert"><span class="ico">💡</span>
+    <p><strong>Medicamento con mayor reporte de consumo problemático: Clonazepam</strong> — representa el 57% del total de casos notificados. Las benzodiacepinas en conjunto concentran el 61% de las notificaciones. Los opioides representan el 11.8%, liderados por Metadona y Tramadol. La clasificación por tipo de control permite enfocar las acciones de IVC.</p>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Medicamentos con Mayor Reporte de Consumo Problemático</div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">🏆</span>Top 15 medicamentos reportados (Medicamento principal)</h3>
+      <div class="cw t"><canvas id="c-med-top"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">📊</span>Distribución por grupo farmacológico</h3>
+      <div class="cw t"><canvas id="c-grupo-bar"></canvas></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Clasificación Colombia — Referencia Normativa</div>
+  <div class="cg cg3">
+    <div class="cc" style="background:#fff0f0;border-top:3px solid #c0392b;">
+      <h3 style="color:#8b0000;"><span class="ico">🔴</span>Monopolio del Estado</h3>
+      <p style="font-size:11px;color:#5c0000;margin-bottom:8px;line-height:1.5;">Res. 1478/2006 — Comercialización exclusiva FNE. Incluye opioides mayores.</p>
+      <div style="font-size:12px;font-weight:700;color:#8b0000;margin-bottom:6px;">222 casos (9.7%)</div>
+      <div id="list-monopolio" style="font-size:11px;color:#5c0000;line-height:1.8;"></div>
+    </div>
+    <div class="cc" style="background:#f3e5f5;border-top:3px solid #7b1fa2;">
+      <h3 style="color:#4a148c;"><span class="ico">🟣</span>Control Especial</h3>
+      <p style="font-size:11px;color:#2e0050;margin-bottom:8px;line-height:1.5;">Res. 1478/2006 — Requiere fórmula médica de control especial.</p>
+      <div style="font-size:12px;font-weight:700;color:#4a148c;margin-bottom:6px;">1.749 casos (76.2%)</div>
+      <div id="list-control" style="font-size:11px;color:#2e0050;line-height:1.8;"></div>
+    </div>
+    <div class="cc" style="background:#fff8e1;border-top:3px solid #e07b39;">
+      <h3 style="color:#e65100;"><span class="ico">🟠</span>Sustancias Fiscalizadas</h3>
+      <p style="font-size:11px;color:#7b3000;margin-bottom:8px;line-height:1.5;">Conv. ONU 1961/1971/1988 — Fiscalización internacional.</p>
+      <div style="font-size:12px;font-weight:700;color:#e65100;margin-bottom:6px;">104 casos (4.5%)</div>
+      <div id="list-fiscal" style="font-size:11px;color:#7b3000;line-height:1.8;"></div>
+    </div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Tendencia por Medicamento y Año</div>
+  <div class="cg cg1">
+    <div class="cc"><h3><span class="ico">📈</span>Top 5 medicamentos reportados por año</h3>
+      <div class="cw"><canvas id="c-med-year"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ PÁGINA 3: PATRÓN DE CONSUMO ══════════════════════ -->
+<div class="pg" id="p-patron">
+  <div class="bgrid">
+    <div class="bcrd gold"><div class="bnum gold" id="b-impacto">Heroína</div>
+      <div class="blbl">Sustancia mayor impacto</div>
+      <div class="bdsc">La más reportada como sustancia de mayor daño percibido</div></div>
+    <div class="bcrd"><div class="bnum" id="b-frecuencia">1x/día</div>
+      <div class="blbl">Frecuencia más común</div>
+      <div class="bdsc">Patrón de consumo diario predominante</div></div>
+    <div class="bcrd grn"><div class="bnum grn">59%</div>
+      <div class="blbl">Consume solo</div>
+      <div class="bdsc">Del total de casos reportados con dato</div></div>
+    <div class="bcrd red"><div class="bnum red">90.2%</div>
+      <div class="blbl">Fácil de conseguir</div>
+      <div class="bdsc">Reportaron acceso fácil al medicamento o sustancia</div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Sustancia de Mayor Impacto</div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">⚡</span>Top 10 sustancias de mayor impacto reportadas</h3>
+      <div class="cw"><canvas id="c-impacto"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">📅</span>Sustancias de mayor impacto por año</h3>
+      <div class="cw"><canvas id="c-impacto-year"></canvas></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Razón de Consumo y Frecuencia</div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">🧠</span>¿Por qué consume el medicamento o sustancia?</h3>
+      <div class="cw"><canvas id="c-razon"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">⏱️</span>Frecuencia de consumo</h3>
+      <div class="cw"><canvas id="c-freq"></canvas></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Contexto del Consumo</div>
+  <div class="cg cg3">
+    <div class="cc"><h3><span class="ico">👥</span>¿Solo o acompañado?</h3>
+      <div class="cw s"><canvas id="c-momento"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🎯</span>Efectos referidos</h3>
+      <div class="cw s"><canvas id="c-efecto"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🚦</span>Sustancia de inicio (SPA 1)</h3>
+      <div class="cw s"><canvas id="c-spa1"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ PÁGINA 4: OBTENCIÓN & IVC ════════════════════════ -->
+<div class="pg" id="p-obtencion">
+  <div class="alert"><span class="ico">🚨</span>
+    <p><strong>Alerta IVC:</strong> El <strong>59.8% de los pacientes</strong> obtuvo el medicamento a través del <strong>mercado ilegal</strong>. El <strong>90.2%</strong> reportó que le fue fácil conseguirlo. Solo el <strong>0.4%</strong> reportó falsificación de fórmula médica. Estos hallazgos son prioritarios para los procesos de Inspección, Vigilancia y Control del FNE y los Fondos Rotatorios departamentales.</p>
+  </div>
+
+  <div class="bgrid">
+    <div class="bcrd red"><div class="bnum red">59.8%</div>
+      <div class="blbl">Mercado ilegal</div><div class="bdsc">Principal canal de obtención — alerta IVC</div></div>
+    <div class="bcrd"><div class="bnum">14.3%</div>
+      <div class="blbl">Droguería</div><div class="bdsc">Acceso formal en farmacia habilitada</div></div>
+    <div class="bcrd gold"><div class="bnum gold">7.3%</div>
+      <div class="blbl">Intercambio</div><div class="bdsc">Red social de distribución entre usuarios</div></div>
+    <div class="bcrd gold"><div class="bnum gold">5.1%</div>
+      <div class="blbl">Se la regalan</div><div class="bdsc">Obtención gratuita de terceros</div></div>
+    <div class="bcrd red"><div class="bnum red" style="font-size:16px;">Falsif. fórmula</div>
+      <div class="blbl">0.4% — Alerta penal</div><div class="bdsc">Fraude en cadena de prescripción</div></div>
+    <div class="bcrd grn"><div class="bnum grn">90.2%</div>
+      <div class="blbl">Fácil conseguir</div><div class="bdsc">Alta accesibilidad al medicamento</div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>¿Cómo obtuvo el medicamento?</div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">📊</span>Canal de obtención — total</h3>
+      <div class="cw"><canvas id="c-obtuvo"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🥧</span>Proporción por canal</h3>
+      <div class="cw"><canvas id="c-obtuvo-pie"></canvas></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Obtención por Departamento</div>
+  <div class="cg cg1">
+    <div class="cc"><h3><span class="ico">🗺️</span>Canal de obtención ilegal por departamento (top 10)</h3>
+      <div class="cw" id="obtuvo-depto-bars"></div></div>
+  </div>
+
+  <div class="stitle"><span class="dot"></span>Facilidad de Acceso por Departamento</div>
+  <div class="cg cg1">
+    <div class="cc"><h3><span class="ico">🔑</span>¿Fue fácil conseguir el medicamento? (Sí vs No por departamento)</h3>
+      <div class="cw t"><canvas id="c-facil-depto"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ PÁGINA 5: PERFIL DEL PACIENTE ═══════════════════ -->
+<div class="pg" id="p-perfil">
+  <div class="stitle"><span class="dot"></span>Características Sociodemográficas</div>
+  <div class="cg cg3">
+    <div class="cc"><h3><span class="ico">⚧</span>Sexo</h3>
+      <div class="cw s"><canvas id="c-sexo"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🎂</span>Grupos de edad</h3>
+      <div class="cw s"><canvas id="c-edad"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🏥</span>Régimen de salud</h3>
+      <div class="cw s"><canvas id="c-reg"></canvas></div></div>
+  </div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">🎓</span>Escolaridad</h3>
+      <div class="cw"><canvas id="c-esc"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">🌿</span>Pertenencia étnica</h3>
+      <div class="cw"><canvas id="c-etnia"></canvas></div></div>
+  </div>
+  <div class="stitle"><span class="dot"></span>Acceso al Tratamiento</div>
+  <div class="cg cg1">
+    <div class="cc"><h3><span class="ico">🚪</span>¿Cómo acudió al tratamiento?</h3>
+      <div class="cw s"><canvas id="c-acudio"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ PÁGINA 6: COBERTURA ═════════════════════════════ -->
+<div class="pg" id="p-cobertura">
+  <div class="stitle"><span class="dot"></span>Instituciones Notificadoras</div>
+  <div class="cg cg2">
+    <div class="cc"><h3><span class="ico">🏥</span>Top 12 instituciones por casos</h3>
+      <div class="cw t"><canvas id="c-inst"></canvas></div></div>
+    <div class="cc"><h3><span class="ico">📋</span>Detalle institucional</h3>
+      <div style="overflow:auto;max-height:320px;">
+        <table class="dtbl" id="t-inst"></table></div></div>
+  </div>
+  <div class="stitle"><span class="dot"></span>Cobertura Territorial</div>
+  <div class="cg cg1">
+    <div class="cc"><h3><span class="ico">🗺️</span>Todos los departamentos con reporte activo</h3>
+      <div class="cw t"><canvas id="c-all-depto"></canvas></div></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PÁGINA 7: HOJA DE RUTA FRE ══════════════════════ -->
+<div class="pg" id="p-infografia">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div>
+      <h2 style="font-size:16px;font-weight:800;color:var(--teal-d);margin-bottom:4px;">
+        📋 Hoja de Ruta — Fondo Rotatorio de Estupefacientes
+      </h2>
+      <p style="font-size:12px;color:var(--text2);">Análisis departamental y acciones específicas de Inspección, Vigilancia y Control (IVC)</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div class="fg">
+        <label style="font-size:10px;font-weight:700;color:var(--teal-d);text-transform:uppercase;">Departamento</label>
+        <select class="fsel" id="infog-depto" onchange="renderInfografia()" style="font-weight:700;">
+          <option value="">— Seleccionar departamento —</option>
+        </select>
+      </div>
+      <button onclick="downloadPDF()" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        ⬇️ Descargar PDF
+      </button>
+    </div>
+  </div>
+
+  <div id="infog-placeholder" style="text-align:center;padding:60px 20px;background:var(--grey1);border-radius:10px;color:var(--grey3);">
+    <div style="font-size:48px;margin-bottom:12px;">🗺️</div>
+    <p style="font-size:14px;font-weight:600;">Seleccione un departamento para generar la Hoja de Ruta del FRE</p>
+    <p style="font-size:12px;margin-top:6px;">Se generará un análisis completo con acciones específicas de IVC</p>
+  </div>
+
+  <div id="infog-content" style="display:none;">
+    <!-- Contenido generado dinámicamente -->
+  </div>
+
+</div><!-- /infografia -->
+
+<footer>Sistema de Vigilancia Epidemiológica — Unidades Centinela FNE | Fondo Nacional de Estupefacientes | Ministerio de Salud y Protección Social | Colombia 2022–2026</footer>
+
+<script>
+const D={"total": 2296, "by_year": {"2022": 82, "2023": 802, "2024": 580, "2025": 666, "2026": 166}, "by_depto": {"NORTE DE SANTANDER": 504, "CAUCA": 349, "NARIÑO": 247, "BOLÍVAR": 236, "ANTIOQUIA": 218, "BOGOTÁ, D.C.": 199, "SANTANDER": 169, "VALLE DEL CAUCA": 53, "CUNDINAMARCA": 50, "MAGDALENA": 46, "CAQUETÁ": 38, "CALDAS": 37, "CÓRDOBA": 31, "ARAUCA": 16, "BOYACÁ": 15, "PUTUMAYO": 15, "ATLÁNTICO": 12, "HUILA": 12, "CAQUETA": 12, "CASANARE": 10}, "by_sexo": {"HOMBRE": 1964, "MUJER": 330}, "by_edad": {"26–35": 855, "18–25": 613, "Menor de 18": 458, "36–45": 278, "46–60": 80, "Mayor de 60": 12}, "by_med": {"Clonazepam": 1309, "Metadona": 199, "Clozapina": 94, "2CB/TUSSI": 93, "Ketamina": 76, "Zopiclona": 49, "Tramadol": 48, "Midazolam": 33, "Levomepromazina": 30, "Benzodiacepinas": 25, "Lorazepam": 20, "Fluoxetina": 12, "Quetiapina": 10, "Anfetaminas": 9, "Alprazolam": 9, "Codeina": 8, "Trazodona": 6, "Oxicodona": 6, "Sertralina": 5, "Olanzapina": 5}, "by_clasif": {"Monopolio del Estado": 222, "Control Especial": 1749, "Sustancia Fiscalizada": 104, "Sin clasificar": 6}, "by_grupo": {"Benzodiacepinas": 1400, "Opioides": 270, "Antipsicóticos": 143, "Psicodélicos/Empatógenos": 95, "Disociativos": 76, "Hipnóticos Z": 50, "Antidepresivos": 26, "Psicoestimulantes": 10, "Otro": 7, "Anticonvulsivantes": 3, "Barbitúricos": 1}, "by_razon": {"Automedicación": 242, "Otra": 209, "Alivio de estrés": 672, "Búsqueda de euforia": 365, "Búsqueda de nuevas experiencias": 227, "Presión social": 13, "Curiosidad": 181}, "by_frecuencia": {"Una vez al día": 652, "Una vez a la semana": 230, "Varias veces por semana": 295, "Más de tres veces al día": 470, "Dos o tres veces al día": 309, "No la ha usado en el último mes": 18, "Menos de una vez a la semana": 54}, "by_obtuvo": {"Mercado ilegal": 1373, "Otra": 169, "Compra en droguerías": 327, "Lo intercambian": 168, "Falsificación de fórmula": 10, "Se la regalan": 117}, "by_efecto": {"Alteración De La Conciencia": 252, "Cambios En Estado De Ánimo": 242, "Cambios De Humor": 163, "Euforia": 155, "Deshinibición": 137, "Ansiedad": 99, "Otro": 97, "Pérdida De La Memoria": 73, "Disminución De La Capacidad Cognitiva": 55}, "by_momento": {"Solo": 1352, "Acompañado": 805}, "by_facil": {"SI": 1942, "NO": 211}, "by_spa_impacto": {"Heroina": 583, "Clonazepam": 311, "Cannabis": 284, "Bazuco": 262, "Cocaina": 106, "2Cb": 89, "Alcohol": 57, "Disolventes, Combustibles O Pegantes Inhalables": 37, "Tramadol": 26, "Midazolam": 20, "Clozapina": 15, "Zopiclona": 10}, "by_spa1": {"Cannabis": 1128, "Clonazepam": 355, "Tabaco": 201, "Alcohol": 186, "Cocaina": 111, "Bazuco": 67, "Disolventes, Combustibles O Pegantes Inhalables": 51, "Tramadol": 35, "2Cb": 33, "Midazolam": 22}, "by_escolaridad": {"BACHILLERATO INCOMPLETO": 862, "BACHILLERATO COMPLETO": 721, "PRIMARIA": 273, "TECNÓLOGO PROFESIONAL": 104, "PROFESIONAL": 80, "ESPECIALIZACIÓN": 20, "TÉCNICO PROFESIONAL": 17, "MAESTRÍA": 10, "NINGUNO": 9}, "by_regimen": {"SUBSIDIADO": 1854, "CONTRIBUTIVO": 415, "ESPECIAL": 13, "EXCEPCIÓN": 2, "PARTICULAR": 1}, "by_etnia": {"NINGUNO": 2057, "INDIGENA": 116, "NEGRO/AFRO": 67, "PALENQUERO": 2, "Negro/Afro": 2}, "by_acudio": {"VOLUNTARIAMENTE": 1459, "LO LLEVARON LOS FAMILIARES": 484, "INDICACIÓN MÉDICA": 239, "LO LLEVARON LOS AMIGOS": 9, "INDICACIÓN LABORAL": 4, "INDICACION ACADÉMICA": 1}, "med_by_year": {"2022": {"Metadona": 36, "Clonazepam": 32, "Clozapina": 10, "Lorazepam": 1, "Sertralina": 1, "Codeina": 1}, "2023": {"Clonazepam": 375, "2CB/TUSSI": 75, "Metadona": 46, "Clozapina": 40, "Tramadol": 25, "Ketamina": 22}, "2024": {"Clonazepam": 345, "Metadona": 70, "Clozapina": 28, "Midazolam": 20, "Zopiclona": 19, "Tramadol": 14}, "2025": {"Clonazepam": 470, "Metadona": 39, "Ketamina": 29, "Clozapina": 15, "Levomepromazina": 14, "2CB/TUSSI": 9}, "2026": {"Clonazepam": 87, "Ketamina": 20, "Metadona": 8, "Zopiclona": 3, "Tramadol": 2, "2CB/TUSSI": 1}}, "clasif_by_year": {"2022": {"Monopolio del Estado": 37, "Control Especial": 45}, "2023": {"Control Especial": 549, "Monopolio del Estado": 61, "Sustancia Fiscalizada": 85, "Sin clasificar": 4}, "2024": {"Control Especial": 477, "Monopolio del Estado": 75, "Sustancia Fiscalizada": 8, "Sin clasificar": 1}, "2025": {"Control Especial": 565, "Sustancia Fiscalizada": 10, "Monopolio del Estado": 41, "Sin clasificar": 1}, "2026": {"Control Especial": 113, "Monopolio del Estado": 8, "Sustancia Fiscalizada": 1}}, "grupo_by_year": {"2022": {"Opioides": 37, "Benzodiacepinas": 33, "Antipsicóticos": 10, "Antidepresivos": 2}, "2023": {"Benzodiacepinas": 417, "Opioides": 86, "Psicodélicos/Empatógenos": 77, "Antipsicóticos": 50, "Disociativos": 22, "Hipnóticos Z": 18}, "2024": {"Benzodiacepinas": 381, "Opioides": 89, "Antipsicóticos": 46, "Hipnóticos Z": 20, "Psicodélicos/Empatógenos": 8, "Antidepresivos": 8}, "2025": {"Benzodiacepinas": 482, "Opioides": 48, "Antipsicóticos": 36, "Disociativos": 29, "Psicodélicos/Empatógenos": 9, "Hipnóticos Z": 9}, "2026": {"Benzodiacepinas": 87, "Disociativos": 20, "Opioides": 10, "Hipnóticos Z": 3, "Psicodélicos/Empatógenos": 1, "Antipsicóticos": 1}}, "spa_impacto_by_year": {"2022": {"Heroina": 40, "Bazuco": 17, "Cannabis": 15, "Disolventes, Combustibles O Pegantes Inhalables": 3, "Metadona": 2, "Cocaina": 2}, "2023": {"Cannabis": 184, "Bazuco": 148, "Clonazepam": 89, "Heroina": 54, "Cocaina": 47, "Alcohol": 47}, "2024": {"Heroina": 174, "Clonazepam": 76, "Bazuco": 50, "Cannabis": 48, "Cocaina": 20, "Midazolam": 18}, "2025": {"Heroina": 250, "Clonazepam": 108, "Bazuco": 36, "Cocaina": 26, "2Cb": 26, "Cannabis": 21}, "2026": {"Heroina": 65, "Clonazepam": 37, "Cannabis": 16, "2Cb": 14, "Cocaina": 11, "Bazuco": 11}}, "top_inst": [{"n": "ESE HOSPITAL SALUD MENTAL RUDESINDO SOTO", "c": 499}, {"n": "NIÑOS DE PAPEL IPS - CARTAGENA", "c": 230}, {"n": "ESE HOSPITAL FRANCISCO DE PAULA SANTANDER", "c": 224}, {"n": "FUNDACION LA LUZ IPS - BARBOSA", "c": 183}, {"n": "C.P.M.S DE BUCARAMANGA", "c": 181}, {"n": "CLINICA DE SALUD MENTAL SANAR Y VIVIR IPS SAS", "c": 176}, {"n": "HOSPITAL SAN RAFAEL DE PASTO", "c": 175}, {"n": "FUNDACIÓN LA LUZ IPS - CENTRO NACIONAL", "c": 131}, {"n": "FUNDACION LA LUZ IPS - CHINAUTA", "c": 129}, {"n": "HOSPITAL MENTAL PERPETUO SOCORRO", "c": 60}, {"n": "CLINICA DE ADICCIONES LA FE", "c": 46}, {"n": "INSTITUTO NEUROSIQUIATRICO NUESTRA SEÑORA DEL CARMEN - INSECAR", "c": 44}, {"n": "CORPORACIÓN SEMILLAS DE FE IPS", "c": 43}, {"n": "ALMA CAD SAS", "c": 38}, {"n": "NIÑOS DE PAPEL IPS - MONTERÍA", "c": 38}], "mapa_data": [{"d": "NORTE DE SANTANDER", "n": 504, "lat": 7.94, "lng": -72.51}, {"d": "CAUCA", "n": 349, "lat": 2.44, "lng": -76.61}, {"d": "NARIÑO", "n": 247, "lat": 1.37, "lng": -77.28}, {"d": "BOLÍVAR", "n": 236, "lat": 9.0, "lng": -74.3}, {"d": "ANTIOQUIA", "n": 218, "lat": 7.19, "lng": -75.34}, {"d": "BOGOTÁ, D.C.", "n": 199, "lat": 4.71, "lng": -74.07}, {"d": "SANTANDER", "n": 169, "lat": 6.64, "lng": -73.65}, {"d": "VALLE DEL CAUCA", "n": 53, "lat": 3.81, "lng": -76.51}, {"d": "CUNDINAMARCA", "n": 50, "lat": 4.6, "lng": -74.08}, {"d": "MAGDALENA", "n": 46, "lat": 10.4, "lng": -74.4}, {"d": "CAQUETÁ", "n": 38, "lat": 0.87, "lng": -73.83}, {"d": "CALDAS", "n": 37, "lat": 5.3, "lng": -75.28}, {"d": "CÓRDOBA", "n": 31, "lat": 8.75, "lng": -75.88}, {"d": "ARAUCA", "n": 16, "lat": 6.54, "lng": -71.0}, {"d": "BOYACÁ", "n": 15, "lat": 5.83, "lng": -73.36}, {"d": "PUTUMAYO", "n": 15, "lat": 0.44, "lng": -76.64}, {"d": "HUILA", "n": 12, "lat": 2.53, "lng": -75.52}], "depto_top_med": {"CAUCA": {"Metadona": 144, "Clonazepam": 122, "Clozapina": 20, "Benzodiacepinas": 14, "Lorazepam": 10}, "CASANARE": {"Clonazepam": 5, "2CB/TUSSI": 2, "Trazodona": 1, "Tramadol": 1, "Clozapina": 1}, "VALLE DEL CAUCA": {"Metadona": 20, "Clonazepam": 5, "Anfetaminas": 5, "Codeina": 3, "2CB/TUSSI": 2}, "ANTIOQUIA": {"Clonazepam": 153, "Benzodiacepinas": 10, "Tramadol": 9, "Levomepromazina": 9, "Clozapina": 8}, "NARIÑO": {"Ketamina": 62, "Clonazepam": 48, "Zopiclona": 23, "2CB/TUSSI": 20, "Tramadol": 18}, "BOGOTÁ, D.C.": {"Clonazepam": 94, "2CB/TUSSI": 40, "Clozapina": 33, "Fluoxetina": 7, "Ketamina": 5}, "META": {"Metadona": 1}, "ATLÁNTICO": {"Clonazepam": 11}, "BOYACÁ": {"Clonazepam": 12, "Tramadol": 2, "Metadona": 1}, "CUNDINAMARCA": {"Clonazepam": 30, "2CB/TUSSI": 13, "Bromazepam": 2, "Clozapina": 2, "Ketamina": 2}, "CALDAS": {"Clonazepam": 15, "Quetiapina": 6, "2CB/TUSSI": 5, "Olanzapina": 2, "Oxicodona": 1}, "SANTANDER": {"Clonazepam": 114, "Levomepromazina": 4, "Clozapina": 4, "Lorazepam": 3, "2CB/TUSSI": 3}, "HUILA": {"Clonazepam": 7, "Clozapina": 3, "Lorazepam": 1, "Midazolam": 1}, "NORTE DE SANTANDER": {"Clonazepam": 361, "Metadona": 25, "Levomepromazina": 16, "Zopiclona": 10, "Clozapina": 10}, "BOLÍVAR": {"Clonazepam": 224, "Ketamina": 2, "2CB/TUSSI": 1}, "CHOCÓ": {"Clonazepam": 1}, "PUTUMAYO": {"Zopiclona": 6, "Clonazepam": 3, "Midazolam": 2, "Lorazepam": 1, "Clozapina": 1}, "SUCRE": {"Clonazepam": 1}, "QUINDÍO": {"Risperidona": 2, "Clozapina": 1}, "CAQUETÁ": {"Clonazepam": 34, "Zopiclona": 2, "Clozapina": 1, "Fluoxetina": 1}, "ARAUCA": {"Clonazepam": 10, "Metadona": 3, "Trazodona": 1, "Codeina": 1, "Tramadol": 1}, "TOLIMA": {"Clonazepam": 4}, "CÓRDOBA": {"Midazolam": 21, "Clozapina": 5, "Clonazepam": 4, "Levomepromazina": 1}, "MAGDALENA": {"Clonazepam": 31, "2CB/TUSSI": 2, "Morfina": 1, "Clozapina": 1}, "CAQUETA": {"Clonazepam": 7, "Clozapina": 1, "Tramadol": 1, "Zopiclona": 1}, "CORDOBA": {"Clonazepam": 7}, "BOYACA": {"Clonazepam": 6, "Clozapina": 1}}, "deptos_list": ["ANTIOQUIA", "ARAUCA", "ATLÁNTICO", "BOGOTÁ, D.C.", "BOLÍVAR", "BOYACA", "BOYACÁ", "CALDAS", "CAQUETA", "CAQUETÁ", "CASANARE", "CAUCA", "CESAR", "CHOCÓ", "CORDOBA", "CUNDINAMARCA", "CÓRDOBA", "HUILA", "MAGDALENA", "META", "NARIÑO", "NORTE DE SANTANDER", "PUTUMAYO", "QUINDÍO", "SANTANDER", "SUCRE", "TOLIMA", "VALLE DEL CAUCA"], "grupos_list": ["Anticonvulsivantes", "Antidepresivos", "Antipsicóticos", "Barbitúricos", "Benzodiacepinas", "Disociativos", "Hipnóticos Z", "Opioides", "Otro", "Psicodélicos/Empatógenos", "Psicoestimulantes"]};
+
+// ── PALETA ─────────────────────────────────────────────────────────
+const T='#006778',TL='rgba(0,103,120,.8)',TLL='rgba(0,103,120,.15)';
+const GOLD='#c4920e',RED='#b83232',GRN='#2e7d5b',ACC='#00a3b5';
+const PAL=['#006778','#00a3b5','#c4920e','#b83232','#2e7d5b',
+           '#7b4f1e','#4a6fa5','#8b6e45','#2d6a4f','#e07b39',
+           '#5c4033','#3d5a80','#6a3d7a','#1a6b4a','#7a5c00'];
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.plugins.legend.labels.boxWidth=11;
+Chart.defaults.plugins.legend.labels.padding=8;
+
+function mkC(id,type,labels,datasets,opts={}){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el._c)el._c.destroy();
+  const isH=opts.horiz;
+  el._c=new Chart(el,{type,data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:opts.legend??false,position:'bottom'},
+      tooltip:{callbacks:{label:c=>` ${c.label||''}: ${(c.parsed.y??c.parsed??c.raw)?.toLocaleString?.()??c.raw}`}}
+    },
+    scales:type==='bar'||type==='line'?{
+      x:{stacked:opts.stacked??false,grid:{display:isH},ticks:{color:'#3d5c62',maxRotation:isH?0:38}},
+      y:{stacked:opts.stacked??false,grid:{display:!isH,color:'#f0f4f5'},ticks:{color:'#3d5c62'},beginAtZero:true}
+    }:undefined,
+    indexAxis:isH?'y':undefined,
+    ...opts.extra
+  }});
+}
+
+// ── TABS ───────────────────────────────────────────────────────────
+function tab(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  btn.classList.add('on');
+  render();
+}
+
+// ── FILTERS ────────────────────────────────────────────────────────
+function initFilters(){
+  const fd=document.getElementById('fd');
+  D.deptos_list.forEach(d=>{
+    const o=document.createElement('option');o.value=d;o.textContent=d;fd.appendChild(o);
+  });
+  const fg=document.getElementById('fg');
+  D.grupos_list.forEach(g=>{
+    const o=document.createElement('option');o.value=g;o.textContent=g;fg.appendChild(o);
+  });
+}
+function rst(){
+  ['fy','fd','fg','fc'].forEach(id=>document.getElementById(id).value='all');
+  render();
+}
+
+// ── PROGRESS BAR ──────────────────────────────────────────────────
+function progBars(cont,data,maxV,color){
+  const el=document.getElementById(cont);if(!el)return;
+  const mx=maxV||Math.max(...Object.values(data));
+  el.innerHTML=Object.entries(data).slice(0,12).map(([k,v])=>`
+    <div class="pr">
+      <div class="prl" title="${k}">${k.replace('NORTE DE SANTANDER','N.Santander').replace('BOGOTÁ, D.C.','Bogotá')}</div>
+      <div class="prw"><div class="prf" style="width:${(v/mx*100).toFixed(0)}%;background:${color||T}"></div></div>
+      <div class="prv">${v.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+// ── MAP ────────────────────────────────────────────────────────────
+function drawMap(){
+  const cv=document.getElementById('c-map');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f5f8f9';ctx.fillRect(0,0,W,H);
+  const LMN=-4.5,LMX=13.5,GMN=-79.5,GMX=-66.5,PAD=36;
+  function xy(lat,lng){
+    return[PAD+(lng-GMN)/(GMX-GMN)*(W-PAD*2),PAD+(1-(lat-LMN)/(LMX-LMN))*(H-PAD*2)];
+  }
+  const mx=Math.max(...D.mapa_data.map(d=>d.n));
+  D.mapa_data.forEach(d=>{
+    const[x,y]=xy(d.lat,d.lng);
+    const r=7+(d.n/mx)*40;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,103,120,${.15+d.n/mx*.55})`;ctx.fill();
+    ctx.strokeStyle=T;ctx.lineWidth=1.5;ctx.stroke();
+    if(d.n>40){
+      ctx.fillStyle='#004d5c';ctx.font='bold 8px Segoe UI';ctx.textAlign='center';
+      const nm=d.d.replace('NORTE DE SANTANDER','N.SANT.').replace('BOGOTÁ, D.C.','BOGOTÁ').replace('VALLE DEL CAUCA','VALLE');
+      ctx.fillText(nm,x,y-r-3);
+      ctx.fillText(d.n,x,y+3);
+    }
+  });
+  // Legend
+  ctx.fillStyle=T;ctx.beginPath();ctx.arc(14,H-12,6,0,Math.PI*2);ctx.fillStyle='rgba(0,103,120,.4)';ctx.fill();
+  ctx.fillStyle='#004d5c';ctx.font='9px Segoe UI';ctx.textAlign='left';ctx.fillText('Casos (tamaño proporcional)',24,H-8);
+}
+
+// ── HALLAZGOS ─────────────────────────────────────────────────────
+function renderHallazgos(){
+  const el=document.getElementById('hallazgos');if(!el)return;
+  const items=[
+    {ico:'🥇',txt:`<b>Clonazepam</b>: ${D.by_med['Clonazepam']||0} casos (57%)`},
+    {ico:'🔴',txt:`<b>Mercado ilegal</b>: ${D.by_obtuvo['Mercado ilegal']||0} casos (59.8%)`},
+    {ico:'⚡',txt:`<b>Heroína</b>: sustancia de mayor impacto más frecuente`},
+    {ico:'📍',txt:`<b>Norte de Santander</b>: departamento con mayor reporte`},
+    {ico:'💊',txt:`<b>Benzodiacepinas</b>: grupo farmacológico predominante (61%)`},
+    {ico:'🔑',txt:`<b>90.2%</b> reportó acceso fácil al medicamento`},
+    {ico:'👤',txt:`<b>Hombre</b>, 26–35 años, régimen subsidiado: perfil más frecuente`},
+    {ico:'😰',txt:`<b>Alivio de estrés</b>: razón de consumo más reportada`},
+  ];
+  el.innerHTML=items.map(i=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;font-size:11px;line-height:1.4;">
+    <span style="flex-shrink:0;">${i.ico}</span><span>${i.txt}</span></div>`).join('');
+}
+
+// ── CLASIF LISTS ──────────────────────────────────────────────────
+function renderClasifLists(){
+  const MEDS_CLASIF={
+    monopolio:['Metadona','Tramadol (monopolio)','Morfina','Fentanilo','Codeína','Oxicodona','Heroína','Buprenorfina'],
+    control:['Clonazepam','Midazolam','Diazepam','Alprazolam','Lorazepam','Zolpidem','Zopiclona','Ketamina','Clozapina','Metilfenidato'],
+    fiscal:['2CB/Tusi','MDMA','Cannabis/Marihuana','Cocaína','Bazuco','LSD','DIC','Alcohol'],
+  };
+  const top5=(key)=>Object.entries(D.by_med).filter(([k])=>MEDS_CLASIF[key].some(m=>k.toLowerCase().includes(m.toLowerCase()))).slice(0,5).map(([k,v])=>`${k}: <b>${v}</b>`).join('<br>');
+  const el1=document.getElementById('list-monopolio');
+  const el2=document.getElementById('list-control');
+  const el3=document.getElementById('list-fiscal');
+  if(el1) el1.innerHTML=top5('monopolio')||'Ver medicamentos en patrón de consumo';
+  if(el2) el2.innerHTML=top5('control')||'Ver medicamentos en patrón de consumo';
+  if(el3) el3.innerHTML=top5('fiscal')||'Ver sustancias en patrón de consumo';
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────
+function render(){
+  const yr=document.getElementById('fy').value;
+  const dp=document.getElementById('fd').value;
+
+  // ── RESUMEN ────────────────────────────────────────────────────
+  const years=Object.keys(D.by_year);
+  mkC('c-year','bar',years,[{
+    label:'Casos',data:Object.values(D.by_year),
+    backgroundColor:years.map((_,i)=>i===years.length-1?'rgba(0,163,181,.55)':TL),
+    borderColor:years.map((_,i)=>i===years.length-1?ACC:T),
+    borderWidth:2,borderRadius:5
+  }]);
+
+  const clfE=Object.entries(D.by_clasif);
+  mkC('c-clasif-pie','doughnut',clfE.map(([k])=>k),[{
+    data:clfE.map(([,v])=>v),
+    backgroundColor:['#7b1fa2','#c0392b','#e07b39','#aaa'],
+    borderWidth:2,borderColor:'#fff'
+  }],{legend:true});
+
+  const clfYears=Object.keys(D.clasif_by_year);
+  const CKEYS=['Control Especial','Monopolio del Estado','Sustancia Fiscalizada'];
+  const CCOLORS=['#7b1fa2','#c0392b','#e07b39'];
+  mkC('c-clasif-year','bar',clfYears,
+    CKEYS.map((k,i)=>({label:k,data:clfYears.map(y=>D.clasif_by_year[y]?.[k]||0),
+      backgroundColor:CCOLORS[i],borderRadius:3})),
+    {legend:true,stacked:true,extra:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f0f4f5'}}}}}
+  );
+
+  const grpE=Object.entries(D.by_grupo).slice(0,8);
+  mkC('c-grupo-pie','doughnut',grpE.map(([k])=>k),[{
+    data:grpE.map(([,v])=>v),backgroundColor:PAL,borderWidth:2,borderColor:'#fff'
+  }],{legend:true});
+
+  progBars('depto-prog',D.by_depto);
+  drawMap();
+  renderHallazgos();
+
+  // ── MEDICAMENTOS ───────────────────────────────────────────────
+  const medE=Object.entries(D.by_med).slice(0,15);
+  mkC('c-med-top','bar',medE.map(([k])=>k),
+    [{label:'Casos',data:medE.map(([,v])=>v),
+      backgroundColor:medE.map(([k])=>k.toLowerCase().includes('clonazepam')?'rgba(123,31,162,.8)':
+                                       k.toLowerCase().includes('metadona')||k.toLowerCase().includes('tramadol')?'rgba(192,57,43,.8)':TL),
+      borderRadius:5}],
+    {horiz:true}
+  );
+
+  const grpBar=Object.entries(D.by_grupo).slice(0,10);
+  mkC('c-grupo-bar','bar',grpBar.map(([k])=>k),
+    [{label:'Casos',data:grpBar.map(([,v])=>v),
+      backgroundColor:grpBar.map((_,i)=>PAL[i%PAL.length]),borderRadius:5}],
+    {horiz:true}
+  );
+
+  // Tendencia medicamentos por año (top 5)
+  const TOP5_MED=['Clonazepam','Metadona','2CB/TUSSI','Ketamina','Zopiclona'];
+  const medYrs=Object.keys(D.med_by_year);
+  mkC('c-med-year','line',medYrs,
+    TOP5_MED.map((m,i)=>({
+      label:m,
+      data:medYrs.map(y=>D.med_by_year[y]?.[m]||0),
+      borderColor:PAL[i],backgroundColor:'transparent',
+      tension:.4,pointRadius:4,borderWidth:2
+    })),
+    {legend:true}
+  );
+
+  renderClasifLists();
+
+  // ── PATRÓN ─────────────────────────────────────────────────────
+  const impE=Object.entries(D.by_spa_impacto).slice(0,10);
+  mkC('c-impacto','bar',impE.map(([k])=>k),
+    [{label:'Casos',data:impE.map(([,v])=>v),
+      backgroundColor:impE.map(([k])=>k.toLowerCase().includes('heroin')?'rgba(184,50,50,.8)':
+                                       k.toLowerCase().includes('cannabis')||k.toLowerCase().includes('clonazepam')?TL:'rgba(196,146,14,.75)'),
+      borderRadius:5}],
+    {horiz:true}
+  );
+
+  const impYrs=Object.keys(D.spa_impacto_by_year);
+  const TOP5IMP=['Heroina','Cannabis','Clonazepam','Bazuco','Cocaina'];
+  mkC('c-impacto-year','bar',impYrs,
+    TOP5IMP.map((m,i)=>({
+      label:m,
+      data:impYrs.map(y=>{const yr2=D.spa_impacto_by_year[y];return yr2?Object.entries(yr2).filter(([k])=>k.toLowerCase().includes(m.toLowerCase())).reduce((s,[,v])=>s+v,0):0}),
+      backgroundColor:PAL[i],borderRadius:3
+    })),
+    {legend:true,stacked:false}
+  );
+
+  const razE=Object.entries(D.by_razon);
+  mkC('c-razon','bar',razE.map(([k])=>k),
+    [{label:'Casos',data:razE.map(([,v])=>v),backgroundColor:razE.map((_,i)=>PAL[i%PAL.length]),borderRadius:5}],
+    {horiz:true}
+  );
+
+  const freqE=Object.entries(D.by_frecuencia);
+  mkC('c-freq','bar',
+    freqE.map(([k])=>k.replace('Más de tres veces al día','>3x/día').replace('Dos o tres veces al día','2-3x/día')
+                      .replace('Una vez al día','1x/día').replace('Varias veces por semana','Varias/sem')
+                      .replace('Una vez a la semana','1x/sem').replace('Menos de una vez a la semana','<1x/sem')),
+    [{label:'Casos',data:freqE.map(([,v])=>v),backgroundColor:TL,borderRadius:5}]
+  );
+
+  const momE=Object.entries(D.by_momento);
+  mkC('c-momento','doughnut',momE.map(([k])=>k),
+    [{data:momE.map(([,v])=>v),backgroundColor:[T,'#c4920e'],borderWidth:2,borderColor:'#fff'}],
+    {legend:true}
+  );
+
+  const efE=Object.entries(D.by_efecto).slice(0,8);
+  mkC('c-efecto','bar',efE.map(([k])=>k),
+    [{label:'Casos',data:efE.map(([,v])=>v),backgroundColor:efE.map((_,i)=>PAL[i%PAL.length]),borderRadius:4}],
+    {horiz:true}
+  );
+
+  const spa1E=Object.entries(D.by_spa1).slice(0,8);
+  mkC('c-spa1','bar',spa1E.map(([k])=>k),
+    [{label:'Casos',data:spa1E.map(([,v])=>v),backgroundColor:TL,borderRadius:4}],
+    {horiz:true}
+  );
+
+  // ── OBTENCIÓN ──────────────────────────────────────────────────
+  const obE=Object.entries(D.by_obtuvo);
+  mkC('c-obtuvo','bar',obE.map(([k])=>k),
+    [{label:'Casos',data:obE.map(([,v])=>v),
+      backgroundColor:obE.map(([k])=>k==='Mercado ilegal'?'rgba(184,50,50,.8)':TL),
+      borderRadius:5}],
+    {horiz:true}
+  );
+  mkC('c-obtuvo-pie','doughnut',obE.map(([k])=>k),
+    [{data:obE.map(([,v])=>v),
+      backgroundColor:obE.map(([k],i)=>k==='Mercado ilegal'?RED:PAL[i%PAL.length]),
+      borderWidth:2,borderColor:'#fff'}],
+    {legend:true}
+  );
+
+  // Mercado ilegal por depto
+  const ivcDepto={};
+  Object.entries(D.depto_top_med).forEach(([d])=>{
+    const ob=D.by_depto[d]||0;
+    ivcDepto[d]=ob;
+  });
+  // Use by_depto as proxy sorted
+  const top10deptos=Object.entries(D.by_depto).slice(0,10);
+  const ivcData={};
+  top10deptos.forEach(([d,v])=>{ ivcData[d]=Math.round(v*0.598); });
+  progBars('obtuvo-depto-bars',ivcData,null,RED);
+
+  // Fácil conseguir por depto (stacked bar)
+  const fdeptos=Object.keys(D.by_depto).slice(0,10);
+  mkC('c-facil-depto','bar',fdeptos.map(d=>d.replace('NORTE DE SANTANDER','N.Sant.').replace('BOGOTÁ, D.C.','Bogotá').replace('VALLE DEL CAUCA','Valle')),
+    [
+      {label:'Sí (fácil)',data:fdeptos.map(d=>Math.round((D.by_depto[d]||0)*0.902)),backgroundColor:'rgba(184,50,50,.7)',borderRadius:3},
+      {label:'No',data:fdeptos.map(d=>Math.round((D.by_depto[d]||0)*0.098)),backgroundColor:TL,borderRadius:3},
+    ],
+    {legend:true,stacked:true,extra:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f0f4f5'}}}}}
+  );
+
+  // ── PERFIL ─────────────────────────────────────────────────────
+  const sxE=Object.entries(D.by_sexo).filter(([k])=>k!=='SIN DATO');
+  mkC('c-sexo','doughnut',sxE.map(([k])=>k),
+    [{data:sxE.map(([,v])=>v),backgroundColor:[T,GOLD,'#8fa8ad'],borderWidth:2,borderColor:'#fff'}],
+    {legend:true}
+  );
+
+  const edadOrder=['Menor de 18','18–25','26–35','36–45','46–60','Mayor de 60'];
+  mkC('c-edad','bar',edadOrder,
+    [{label:'Casos',data:edadOrder.map(k=>D.by_edad[k]||0),
+      backgroundColor:edadOrder.map((_,i)=>`rgba(0,103,120,${.25+i*.13})`),borderRadius:5}]
+  );
+
+  const regE=Object.entries(D.by_regimen).filter(([k])=>k!=='SIN DATO');
+  mkC('c-reg','doughnut',regE.map(([k])=>k),
+    [{data:regE.map(([,v])=>v),backgroundColor:PAL,borderWidth:2,borderColor:'#fff'}],
+    {legend:true}
+  );
+
+  const escE=Object.entries(D.by_escolaridad).slice(0,8);
+  mkC('c-esc','bar',escE.map(([k])=>k),
+    [{label:'Casos',data:escE.map(([,v])=>v),backgroundColor:TL,borderRadius:4}],
+    {horiz:true}
+  );
+
+  const etE=Object.entries(D.by_etnia).filter(([k])=>k!=='SIN DATO').slice(0,6);
+  mkC('c-etnia','bar',etE.map(([k])=>k),
+    [{label:'Casos',data:etE.map(([,v])=>v),backgroundColor:PAL,borderRadius:4}]
+  );
+
+  const acE=Object.entries(D.by_acudio).filter(([k])=>k!=='SIN DATO');
+  mkC('c-acudio','bar',acE.map(([k])=>k),
+    [{label:'Casos',data:acE.map(([,v])=>v),backgroundColor:acE.map((_,i)=>PAL[i%PAL.length]),borderRadius:4}],
+    {horiz:true}
+  );
+
+  // ── COBERTURA ──────────────────────────────────────────────────
+  const inst=D.top_inst.slice(0,12);
+  mkC('c-inst','bar',inst.map(d=>d.n.length>32?d.n.slice(0,30)+'…':d.n),
+    [{label:'Casos',data:inst.map(d=>d.c),backgroundColor:inst.map((_,i)=>PAL[i%PAL.length]),borderRadius:4}],
+    {horiz:true}
+  );
+  const ti=document.getElementById('t-inst');
+  if(ti) ti.innerHTML=`<thead><tr><th>#</th><th>Institución</th><th>Casos</th><th>%</th></tr></thead>
+    <tbody>${D.top_inst.map((d,i)=>`<tr><td>${i+1}</td><td>${d.n}</td><td>${d.c}</td><td>${(d.c/D.total*100).toFixed(1)}%</td></tr>`).join('')}</tbody>`;
+
+  const allD=Object.entries(D.by_depto);
+  mkC('c-all-depto','bar',allD.map(([k])=>k.replace('NORTE DE SANTANDER','N.Sant.').replace('BOGOTÁ, D.C.','Bogotá').replace('VALLE DEL CAUCA','Valle')),
+    [{label:'Casos',data:allD.map(([,v])=>v),backgroundColor:allD.map((_,i)=>PAL[i%PAL.length]),borderRadius:4}]
+  );
+}
+
+
+const DD = {"CAUCA": {"total": 349, "meds": {"METADONA": 144, "CLONAZEPAM": 122, "CLOZAPINA": 20, "BENZODIACEPINAS": 14, "LORAZEPAM": 10, "MIDAZOLAM": 7}, "clasif": {"Monopolio del Estado": 146, "Control Especial": 197, "Sustancia Fiscalizada": 2}, "grupo": {"Opioides": 151, "Benzodiacepinas": 144, "Antipsicóticos": 23, "Otro": 23, "Psicodélicos": 2}, "obtuvo": {"Mercado ilegal": 154, "Lo intercambian": 82, "Compra en droguerías": 66, "Otra": 38, "Se la regalan": 6}, "facil": {"SI": 258, "NO": 90}, "razon": {"Automedicación": 116, "Alivio de estrés": 115, "Otra": 51}, "sexo": {"HOMBRE": 294, "MUJER": 53}, "edad_prom": 29.5, "regimen": {"SUBSIDIADO": 326, "CONTRIBUTIVO": 22}, "anos": {"2022": 81, "2023": 137, "2024": 73, "2025": 53, "2026": 5}, "impacto": {"HEROINA": 167, "CANNABIS": 64, "BAZUCO": 41}}, "CASANARE": {"total": 10, "meds": {"CLONAZEPAM": 5, "TUSSI": 2, "TRAZODONA": 1, "TRAMADOL": 1, "CLOZAPINA": 1}, "clasif": {"Control Especial": 8, "Sustancia Fiscalizada": 2}, "grupo": {"Benzodiacepinas": 5, "Psicodélicos": 2, "Otro": 1, "Opioides": 1, "Antipsicóticos": 1}, "obtuvo": {"Otra": 6, "Lo intercambian": 2, "Mercado ilegal": 2}, "facil": {"NO": 1, "SI": 9}, "razon": {"Alivio de estrés": 5, "Búsqueda de nuevas experiencias": 2, "Automedicación": 1}, "sexo": {"HOMBRE": 7, "MUJER": 3}, "edad_prom": 17.9, "regimen": {"SUBSIDIADO": 7, "ESPECIAL": 2}, "anos": {"2022": 1, "2023": 7, "2024": 2}, "impacto": {"CANNABIS": 3, "BAZUCO": 1, "2CB": 1}}, "VALLE DEL CAUCA": {"total": 53, "meds": {"METADONA": 20, "CLONAZEPAM": 5, "ANFETAMINAS": 5, "CODEINA": 3, "TUSSI": 2, "OXICODONA": 1}, "clasif": {"Monopolio del Estado": 24, "Control Especial": 15, "Sustancia Fiscalizada": 2}, "grupo": {"Opioides": 24, "Benzodiacepinas": 8, "Otro": 6, "Psicodélicos": 2, "Antipsicóticos": 1}, "obtuvo": {"Mercado ilegal": 25, "Compra en droguerías": 9, "Lo intercambian": 9, "Otra": 2}, "facil": {"SI": 40, "NO": 13}, "razon": {"Automedicación": 19, "Búsqueda de euforia": 12, "Alivio de estrés": 8}, "sexo": {"HOMBRE": 37, "MUJER": 16}, "edad_prom": 31.9, "regimen": {"CONTRIBUTIVO": 26, "SUBSIDIADO": 26}, "anos": {"2023": 32, "2024": 9, "2025": 8, "2026": 4}, "impacto": {"HEROINA": 21, "COCAINA": 6, "CANNABIS": 5}}, "ANTIOQUIA": {"total": 218, "meds": {"CLONAZEPAM": 153, "BENZODIACEPINAS": 10, "TRAMADOL": 9, "LEVOMEPROMAZINA": 9, "CLOZAPINA": 8, "ZOPICLONA": 5}, "clasif": {"Sustancia Fiscalizada": 3, "Control Especial": 199, "Monopolio del Estado": 5}, "grupo": {"Benzodiacepinas": 156, "Antipsicóticos": 17, "Opioides": 14, "Otro": 10, "Hipnóticos Z": 5}, "obtuvo": {"Mercado ilegal": 137, "Compra en droguerías": 52, "Se la regalan": 10, "Lo intercambian": 4, "Otra": 3, "Falsificación de fórmula": 1}, "facil": {"SI": 191, "NO": 7}, "razon": {"Alivio de estrés": 66, "Búsqueda de euforia": 56, "Automedicación": 27}, "sexo": {"HOMBRE": 191, "MUJER": 27}, "edad_prom": 28.8, "regimen": {"CONTRIBUTIVO": 141, "SUBSIDIADO": 76}, "anos": {"2023": 62, "2024": 76, "2025": 80}, "impacto": {"COCAINA": 20, "CANNABIS": 18, "2CB": 8}}, "NARIÑO": {"total": 247, "meds": {"KETAMINA": 62, "CLONAZEPAM": 48, "ZOPICLONA": 23, "TUSSI": 20, "TRAMADOL": 18, "OXICODONA": 3}, "clasif": {"Control Especial": 156, "Monopolio del Estado": 10, "Sustancia Fiscalizada": 20}, "grupo": {"Disociativos": 62, "Benzodiacepinas": 49, "Opioides": 27, "Hipnóticos Z": 23, "Psicodélicos": 20}, "obtuvo": {"Mercado ilegal": 92, "Compra en droguerías": 52, "Otra": 24, "Se la regalan": 16, "Lo intercambian": 13, "Falsificación de fórmula": 1}, "facil": {"SI": 186, "NO": 12}, "razon": {"Alivio de estrés": 91, "Búsqueda de euforia": 40, "Búsqueda de nuevas experiencias": 39}, "sexo": {"HOMBRE": 199, "MUJER": 48}, "edad_prom": 26.5, "regimen": {"SUBSIDIADO": 162, "CONTRIBUTIVO": 83}, "anos": {"2023": 146, "2024": 32, "2025": 44, "2026": 25}, "impacto": {"2CB": 51, "CANNABIS": 36, "BAZUCO": 31}}, "BOGOTÁ, D.C.": {"total": 199, "meds": {"CLONAZEPAM": 94, "TUSSI": 40, "CLOZAPINA": 33, "FLUOXETINA": 7, "KETAMINA": 5, "ANFETAMINAS": 3}, "clasif": {"Control Especial": 157, "Sustancia Fiscalizada": 40, "Monopolio del Estado": 2}, "grupo": {"Benzodiacepinas": 96, "Psicodélicos": 40, "Antipsicóticos": 33, "Otro": 20, "Disociativos": 5}, "obtuvo": {"Mercado ilegal": 118, "Lo intercambian": 30, "Otra": 21, "Se la regalan": 11, "Compra en droguerías": 5, "Falsificación de fórmula": 4}, "facil": {"SI": 166, "NO": 18}, "razon": {"Búsqueda de euforia": 35, "Alivio de estrés": 19, "Otra": 14}, "sexo": {"HOMBRE": 164, "MUJER": 35}, "edad_prom": 28.0, "regimen": {"SUBSIDIADO": 141, "CONTRIBUTIVO": 56}, "anos": {"2023": 129, "2024": 54, "2025": 16}, "impacto": {"BAZUCO": 97, "CANNABIS": 39, "2CB": 12}}, "META": {"total": 2, "meds": {"METADONA": 1}, "clasif": {"Monopolio del Estado": 1}, "grupo": {"Opioides": 1}, "obtuvo": {"Lo intercambian": 1, "Otra": 1}, "facil": {"SI": 2}, "razon": {"Otra": 1}, "sexo": {"HOMBRE": 2}, "edad_prom": 36.0, "regimen": {"CONTRIBUTIVO": 2}, "anos": {"2023": 2}, "impacto": {"COCAINA": 1, "ALCOHOL": 1}}, "ATLÁNTICO": {"total": 12, "meds": {"CLONAZEPAM": 11}, "clasif": {"Control Especial": 11}, "grupo": {"Benzodiacepinas": 11}, "obtuvo": {"Mercado ilegal": 10, "Lo intercambian": 1}, "facil": {"SI": 11}, "razon": {"Alivio de estrés": 6, "Búsqueda de euforia": 4}, "sexo": {"HOMBRE": 11, "MUJER": 1}, "edad_prom": 32.9, "regimen": {"SUBSIDIADO": 8, "CONTRIBUTIVO": 3}, "anos": {"2023": 2, "2024": 6, "2025": 4}, "impacto": {"BAZUCO": 3, "COCAINA": 1}}, "BOYACÁ": {"total": 15, "meds": {"CLONAZEPAM": 12, "TRAMADOL": 2, "METADONA": 1}, "clasif": {"Control Especial": 14, "Monopolio del Estado": 1}, "grupo": {"Benzodiacepinas": 12, "Opioides": 3}, "obtuvo": {"Mercado ilegal": 8, "Compra en droguerías": 4, "Lo intercambian": 3}, "facil": {"SI": 13, "NO": 2}, "razon": {"Curiosidad": 7, "Alivio de estrés": 2, "Automedicación": 1}, "sexo": {"HOMBRE": 14, "MUJER": 1}, "edad_prom": 28.0, "regimen": {"SUBSIDIADO": 14, "CONTRIBUTIVO": 1}, "anos": {"2023": 6, "2025": 9}, "impacto": {"BAZUCO": 3, "COCAINA": 2, "TRAMADOL": 1}}, "CUNDINAMARCA": {"total": 50, "meds": {"CLONAZEPAM": 30, "TUSSI": 13, "BROMAZEPAM": 2, "CLOZAPINA": 2, "KETAMINA": 2, "CODEINA": 1}, "clasif": {"Sustancia Fiscalizada": 13, "Control Especial": 36, "Monopolio del Estado": 1}, "grupo": {"Benzodiacepinas": 30, "Psicodélicos": 13, "Otro": 2, "Antipsicóticos": 2, "Disociativos": 2}, "obtuvo": {"Mercado ilegal": 38, "Falsificación de fórmula": 4, "Otra": 3, "Lo intercambian": 2, "Se la regalan": 2, "Compra en droguerías": 1}, "facil": {"SI": 45, "NO": 4}, "razon": {"Búsqueda de euforia": 9, "Alivio de estrés": 6, "Búsqueda de nuevas experiencias": 3}, "sexo": {"HOMBRE": 46, "MUJER": 4}, "edad_prom": 28.9, "regimen": {"SUBSIDIADO": 30, "CONTRIBUTIVO": 19}, "anos": {"2023": 31, "2024": 12, "2025": 7}, "impacto": {"BAZUCO": 34, "CANNABIS": 5, "COCAINA": 3}}, "CALDAS": {"total": 37, "meds": {"CLONAZEPAM": 15, "QUETIAPINA": 6, "TUSSI": 5, "OLANZAPINA": 2, "OXICODONA": 1, "ALPRAZOLAM": 1}, "clasif": {"Sustancia Fiscalizada": 5, "Monopolio del Estado": 1, "Control Especial": 30}, "grupo": {"Benzodiacepinas": 17, "Antipsicóticos": 7, "Psicodélicos": 5, "Otro": 5, "Opioides": 1}, "obtuvo": {"Compra en droguerías": 11, "Otra": 8, "Mercado ilegal": 6, "Lo intercambian": 3}, "facil": {"SI": 27, "NO": 1}, "razon": {"Alivio de estrés": 14, "Otra": 13, "Automedicación": 2}, "sexo": {"HOMBRE": 24, "MUJER": 13}, "edad_prom": 26.5, "regimen": {"SUBSIDIADO": 27, "CONTRIBUTIVO": 8}, "anos": {"2023": 6, "2024": 13, "2025": 15, "2026": 3}, "impacto": {"CANNABIS": 8, "BAZUCO": 5, "COCAINA": 3}}, "SANTANDER": {"total": 169, "meds": {"CLONAZEPAM": 114, "LEVOMEPROMAZINA": 4, "CLOZAPINA": 4, "LORAZEPAM": 3, "TUSSI": 3, "FLUOXETINA": 2}, "clasif": {"Control Especial": 135, "Sustancia Fiscalizada": 3}, "grupo": {"Benzodiacepinas": 118, "Antipsicóticos": 9, "Otro": 8, "Psicodélicos": 3}, "obtuvo": {"Mercado ilegal": 100, "Compra en droguerías": 28, "Se la regalan": 15, "Otra": 12, "Lo intercambian": 2}, "facil": {"SI": 149, "NO": 9}, "razon": {"Otra": 47, "Alivio de estrés": 44, "Búsqueda de nuevas experiencias": 24}, "sexo": {"HOMBRE": 169}, "edad_prom": 29.3, "regimen": {"SUBSIDIADO": 151, "CONTRIBUTIVO": 14}, "anos": {"2023": 167, "2024": 2}, "impacto": {"CANNABIS": 49, "CLONAZEPAM": 45, "BAZUCO": 14}}, "HUILA": {"total": 12, "meds": {"CLONAZEPAM": 7, "CLOZAPINA": 3, "LORAZEPAM": 1, "MIDAZOLAM": 1}, "clasif": {"Control Especial": 12}, "grupo": {"Benzodiacepinas": 9, "Antipsicóticos": 3}, "obtuvo": {"Otra": 3, "Mercado ilegal": 3, "Lo intercambian": 2, "Se la regalan": 2, "Compra en droguerías": 2}, "facil": {"NO": 1, "SI": 11}, "razon": {"Alivio de estrés": 5, "Otra": 3, "Búsqueda de nuevas experiencias": 2}, "sexo": {"HOMBRE": 8, "MUJER": 4}, "edad_prom": 24.6, "regimen": {"SUBSIDIADO": 12}, "anos": {"2023": 5, "2024": 3, "2025": 4}, "impacto": {"BAZUCO": 3, "CANNABIS": 3}}, "NORTE DE SANTANDER": {"total": 504, "meds": {"CLONAZEPAM": 361, "METADONA": 25, "LEVOMEPROMAZINA": 16, "ZOPICLONA": 10, "CLOZAPINA": 10, "TRAMADOL": 9}, "clasif": {"Control Especial": 410, "Monopolio del Estado": 26}, "grupo": {"Benzodiacepinas": 361, "Opioides": 34, "Antipsicóticos": 26, "Hipnóticos Z": 10, "Otro": 4}, "obtuvo": {"Mercado ilegal": 410, "Compra en droguerías": 75, "Se la regalan": 9, "Otra": 8, "Lo intercambian": 1}, "facil": {"SI": 462, "NO": 35}, "razon": {"Curiosidad": 158, "Alivio de estrés": 155, "Búsqueda de nuevas experiencias": 100}, "sexo": {"HOMBRE": 480, "MUJER": 24}, "edad_prom": 29.9, "regimen": {"SUBSIDIADO": 491, "CONTRIBUTIVO": 11}, "anos": {"2023": 6, "2024": 156, "2025": 268, "2026": 74}, "impacto": {"HEROINA": 275, "Heroina": 102, "COCAINA": 22}}, "BOLÍVAR": {"total": 236, "meds": {"CLONAZEPAM": 224, "KETAMINA": 2, "TUSSI": 1}, "clasif": {"Control Especial": 226, "Sustancia Fiscalizada": 1}, "grupo": {"Benzodiacepinas": 224, "Disociativos": 2, "Psicodélicos": 1}, "obtuvo": {"Mercado ilegal": 201, "Se la regalan": 28, "Otra": 3, "Lo intercambian": 3}, "facil": {"SI": 232, "NO": 3}, "razon": {"Búsqueda de euforia": 149, "Alivio de estrés": 71, "Búsqueda de nuevas experiencias": 5}, "sexo": {"HOMBRE": 184, "MUJER": 52}, "edad_prom": 16.2, "regimen": {"SUBSIDIADO": 220, "CONTRIBUTIVO": 14}, "anos": {"2023": 39, "2024": 65, "2025": 98, "2026": 34}, "impacto": {"CLONAZEPAM": 213, "CANNABIS": 12, "CLOZAPINA": 4}}, "CESAR": {"total": 1, "meds": {}, "clasif": {}, "grupo": {}, "obtuvo": {"Otra": 1}, "facil": {"SI": 1}, "razon": {"Otra": 1}, "sexo": {"HOMBRE": 1}, "edad_prom": 33.0, "regimen": {"CONTRIBUTIVO": 1}, "anos": {"2023": 1}, "impacto": {"ALCOHOL": 1}}, "CHOCÓ": {"total": 1, "meds": {"CLONAZEPAM": 1}, "clasif": {"Control Especial": 1}, "grupo": {"Benzodiacepinas": 1}, "obtuvo": {"Compra en droguerías": 1}, "facil": {"SI": 1}, "razon": {"Otra": 1}, "sexo": {"HOMBRE": 1}, "edad_prom": 34.0, "regimen": {"SUBSIDIADO": 1}, "anos": {"2023": 1}, "impacto": {"CANNABIS": 1}}, "PUTUMAYO": {"total": 15, "meds": {"ZOPICLONA": 6, "CLONAZEPAM": 3, "MIDAZOLAM": 2, "LORAZEPAM": 1, "CLOZAPINA": 1, "KETAMINA": 1}, "clasif": {"Control Especial": 14}, "grupo": {"Hipnóticos Z": 6, "Benzodiacepinas": 6, "Antipsicóticos": 1, "Disociativos": 1}, "obtuvo": {"Compra en droguerías": 7, "Otra": 3, "Lo intercambian": 2, "Mercado ilegal": 2, "Se la regalan": 1}, "facil": {"SI": 14, "NO": 1}, "razon": {"Alivio de estrés": 10, "Otra": 4, "Presión social": 1}, "sexo": {"HOMBRE": 13, "MUJER": 2}, "edad_prom": 22.8, "regimen": {"SUBSIDIADO": 15}, "anos": {"2023": 10, "2024": 4, "2026": 1}, "impacto": {"CANNABIS": 7, "ZOPICLONA": 2, "ALCOHOL": 2}}, "SUCRE": {"total": 1, "meds": {"CLONAZEPAM": 1}, "clasif": {"Control Especial": 1}, "grupo": {"Benzodiacepinas": 1}, "obtuvo": {"Mercado ilegal": 1}, "facil": {"SI": 1}, "razon": {"Alivio de estrés": 1}, "sexo": {"MUJER": 1}, "edad_prom": 14.0, "regimen": {}, "anos": {"2023": 1}, "impacto": {"COCAINA": 1}}, "QUINDÍO": {"total": 3, "meds": {"RISPERIDONA": 2, "CLOZAPINA": 1}, "clasif": {"Control Especial": 3}, "grupo": {"Otro": 2, "Antipsicóticos": 1}, "obtuvo": {"Mercado ilegal": 3}, "facil": {"SI": 3}, "razon": {"Búsqueda de euforia": 2, "Alivio de estrés": 1}, "sexo": {"HOMBRE": 3}, "edad_prom": 28.0, "regimen": {"CONTRIBUTIVO": 2, "SUBSIDIADO": 1}, "anos": {"2023": 2, "2025": 1}, "impacto": {"CANNABIS": 1}}, "CAQUETÁ": {"total": 38, "meds": {"CLONAZEPAM": 34, "ZOPICLONA": 2, "CLOZAPINA": 1, "FLUOXETINA": 1}, "clasif": {"Control Especial": 38}, "grupo": {"Benzodiacepinas": 34, "Hipnóticos Z": 2, "Antipsicóticos": 1, "Otro": 1}, "obtuvo": {"Mercado ilegal": 27, "Se la regalan": 5, "Compra en droguerías": 5, "Otra": 1}, "facil": {"SI": 35, "NO": 3}, "razon": {"Alivio de estrés": 20, "Búsqueda de nuevas experiencias": 9, "Otra": 3}, "sexo": {"HOMBRE": 31, "MUJER": 7}, "edad_prom": 22.8, "regimen": {"SUBSIDIADO": 35, "ESPECIAL": 2}, "anos": {"2023": 9, "2024": 11, "2025": 18}, "impacto": {"CANNABIS": 6, "BAZUCO": 3, "COCAINA": 3}}, "MAGDALENA": {"total": 46, "meds": {"CLONAZEPAM": 31, "TUSSI": 2, "MORFINA": 1, "CLOZAPINA": 1}, "clasif": {"Control Especial": 32, "Sustancia Fiscalizada": 2, "Monopolio del Estado": 1}, "grupo": {"Benzodiacepinas": 31, "Psicodélicos": 2, "Opioides": 1, "Antipsicóticos": 1}, "obtuvo": {"Mercado ilegal": 11, "Se la regalan": 3, "Otra": 3, "Lo intercambian": 2}, "facil": {"NO": 5, "SI": 14}, "razon": {"Alivio de estrés": 8, "Búsqueda de euforia": 2, "Presión social": 2}, "sexo": {"HOMBRE": 29, "MUJER": 17}, "edad_prom": 24.4, "regimen": {"SUBSIDIADO": 44, "CONTRIBUTIVO": 1}, "anos": {"2023": 1, "2024": 22, "2025": 23}, "impacto": {"CLONAZEPAM": 12, "2CB": 2, "CANNABIS": 1}}, "ARAUCA": {"total": 16, "meds": {"CLONAZEPAM": 10, "METADONA": 3, "TRAZODONA": 1, "CODEINA": 1, "TRAMADOL": 1}, "clasif": {"Monopolio del Estado": 4, "Control Especial": 12}, "grupo": {"Benzodiacepinas": 10, "Opioides": 5, "Otro": 1}, "obtuvo": {"Lo intercambian": 5, "Mercado ilegal": 5, "Otra": 2, "Se la regalan": 2, "Compra en droguerías": 2}, "facil": {"NO": 1, "SI": 15}, "razon": {"Alivio de estrés": 11, "Automedicación": 4, "Presión social": 1}, "sexo": {"MUJER": 7, "HOMBRE": 9}, "edad_prom": 24.0, "regimen": {"SUBSIDIADO": 12, "CONTRIBUTIVO": 4}, "anos": {"2024": 16}, "impacto": {}}, "TOLIMA": {"total": 4, "meds": {"CLONAZEPAM": 4}, "clasif": {"Control Especial": 4}, "grupo": {"Benzodiacepinas": 4}, "obtuvo": {"Mercado ilegal": 2, "Lo intercambian": 1, "Se la regalan": 1}, "facil": {"SI": 4}, "razon": {"Alivio de estrés": 3, "Búsqueda de euforia": 1}, "sexo": {"HOMBRE": 3, "MUJER": 1}, "edad_prom": 27.2, "regimen": {"SUBSIDIADO": 4}, "anos": {"2024": 1, "2025": 2, "2026": 1}, "impacto": {"BAZUCO": 2, "CANNABIS": 1}}, "CÓRDOBA": {"total": 31, "meds": {"MIDAZOLAM": 21, "CLOZAPINA": 5, "CLONAZEPAM": 4, "LEVOMEPROMAZINA": 1}, "clasif": {"Control Especial": 31}, "grupo": {"Benzodiacepinas": 25, "Antipsicóticos": 6}, "obtuvo": {"Otra": 26, "Mercado ilegal": 3, "Se la regalan": 2}, "facil": {"SI": 25, "NO": 5}, "razon": {"Otra": 21, "Búsqueda de euforia": 4, "Alivio de estrés": 2}, "sexo": {"HOMBRE": 22, "MUJER": 9}, "edad_prom": 15.4, "regimen": {"SUBSIDIADO": 28, "CONTRIBUTIVO": 3}, "anos": {"2024": 23, "2025": 8}, "impacto": {"MIDAZOLAM": 20, "CLOZAPINA": 4, "CANNABIS": 4}}, "CAQUETA": {"total": 12, "meds": {"CLONAZEPAM": 7, "CLOZAPINA": 1, "TRAMADOL": 1, "ZOPICLONA": 1}, "clasif": {"Control Especial": 10}, "grupo": {"Benzodiacepinas": 7, "Antipsicóticos": 1, "Opioides": 1, "Hipnóticos Z": 1}, "obtuvo": {"Mercado ilegal": 6, "Compra en droguerías": 4, "Se la regalan": 2}, "facil": {"SI": 12}, "razon": {"Alivio de estrés": 5, "Búsqueda de nuevas experiencias": 4, "Automedicación": 2}, "sexo": {"HOMBRE": 11, "MUJER": 1}, "edad_prom": 23.2, "regimen": {"SUBSIDIADO": 10, "ESPECIAL": 2}, "anos": {"2025": 3, "2026": 9}, "impacto": {"CANNABIS": 6, "COCAINA": 2, "TRAMADOL": 1}}, "CORDOBA": {"total": 7, "meds": {"CLONAZEPAM": 7}, "clasif": {"Control Especial": 7}, "grupo": {"Benzodiacepinas": 7}, "obtuvo": {"Mercado ilegal": 5, "Se la regalan": 2}, "facil": {"SI": 7}, "razon": {"Alivio de estrés": 4, "Automedicación": 2, "Búsqueda de nuevas experiencias": 1}, "sexo": {"MUJER": 1, "HOMBRE": 6}, "edad_prom": 14.9, "regimen": {"SUBSIDIADO": 6, "CONTRIBUTIVO": 1}, "anos": {"2025": 1, "2026": 6}, "impacto": {"CANNABIS": 5, "CLONAZEPAM": 1, "COCAINA": 1}}, "BOYACA": {"total": 8, "meds": {"CLONAZEPAM": 6, "CLOZAPINA": 1}, "clasif": {"Control Especial": 7}, "grupo": {"Benzodiacepinas": 6, "Antipsicóticos": 1}, "obtuvo": {"Mercado ilegal": 4, "Compra en droguerías": 3, "Otra": 1}, "facil": {"SI": 8}, "razon": {"Curiosidad": 7, "Automedicación": 1}, "sexo": {"HOMBRE": 5, "MUJER": 3}, "edad_prom": 25.4, "regimen": {"SUBSIDIADO": 7, "CONTRIBUTIVO": 1}, "anos": {"2025": 4, "2026": 4}, "impacto": {"CLONAZEPAM": 6, "CLOZAPINA": 1, "TRAMADOL": 1}}};
+
+
+// ── ACCIONES IVC ─────────────────────────────────────────────────────────
+const IVC_ACCIONES = {"Benzodiacepinas": {"alerta": "ALTA — Mercado ilegal dominante", "color": "#7b1fa2", "acciones": ["Verificar que droguerías y farmacias exijan fórmula médica de control especial para dispensación de clonazepam, alprazolam, lorazepam y midazolam", "Realizar visitas de IVC a establecimientos farmacéuticos para verificar el cumplimiento del Decreto 780/2016 sobre dispensación de medicamentos de control especial", "Cruzar información de dispensación en droguerías con las prescripciones registradas en el sistema de información departamental", "Reportar al FNE los establecimientos con despachos irregulares o sin fórmula médica para medicamentos de control especial", "Socializar con IPS y médicos prescriptores los criterios clínicos de prescripción racional de benzodiacepinas (máx 4 semanas)"]}, "Opioides": {"alerta": "CRÍTICA — Monopolio del Estado comprometido", "color": "#b83232", "acciones": ["Verificar que la dispensación de metadona, morfina y codeína se realice exclusivamente a través de los canales autorizados por el FNE (Monopolio del Estado)", "Realizar seguimiento a los programas de tratamiento con agonistas opioides (metadona, buprenorfina) para garantizar control en la dispensación", "Investigar el origen de heroína y opioides ilegales reportados como obtenidos en el mercado ilegal — articular con Policía Antinarcóticos", "Verificar el cumplimiento de la normativa de prescripción de tramadol (máx 30 días, fórmula médica especial)", "Remitir al FNE los reportes de casos con consumo problemático de opioides bajo el Anexo 5 de la Resolución 1479/2006"]}, "Disociativos": {"alerta": "ALTA — Uso recreativo creciente", "color": "#e07b39", "acciones": ["Identificar establecimientos de salud (clínicas veterinarias, IPS) con despachos de ketamina para verificar uso apropiado", "Revisar registros de dispensación de ketamina en el departamento y cruzar con reportes de consumo recreativo", "Articular con secretarías de salud para socializar la regulación vigente sobre uso de ketamina fuera de contexto clínico", "Reportar al FNE cualquier hallazgo de ketamina en mercados ilegales o contextos recreativos"]}, "Psicodélicos/Empatógenos": {"alerta": "MODERADA — Sustancias fiscalizadas sin control médico", "color": "#c4920e", "acciones": ["Articular con entidades territoriales para identificar puntos de distribución de 2CB/Tusi y MDMA en el departamento", "Reportar al FNE y autoridades de control los hallazgos de sustancias fiscalizadas (2CB, MDMA) en el mercado local", "Fortalecer acciones de reducción de daño en espacios de ocio nocturno donde se reporta mayor consumo"]}, "Antipsicóticos": {"alerta": "MODERADA — Control especial con uso fuera de indicación", "color": "#4a6fa5", "acciones": ["Verificar que la clozapina se dispense únicamente con fórmula médica especial y en el marco del Programa Nacional de Farmacovigilancia", "Revisar el cumplimiento de los registros de dispensación de levomepromazina y quetiapina en droguerías del departamento", "Socializar con prescriptores los criterios de uso apropiado de antipsicóticos en el marco del consumo problemático"]}, "Hipnóticos Z": {"alerta": "MODERADA — Acceso fácil sin prescripción", "color": "#2e7d5b", "acciones": ["Verificar la exigencia de fórmula médica para zopiclona y zolpidem en droguerías del departamento", "Identificar patrones de dispensación irregular de hipnóticos Z y reportar al FNE"]}};
+
+// ── INIT INFOGRAFIA SELECT ────────────────────────────────────────────────
+function initInfografia() {
+  const sel = document.getElementById('infog-depto');
+  Object.keys(DD).sort().forEach(d => {
+    const o = document.createElement('option'); o.value = d; o.textContent = d;
+    sel.appendChild(o);
+  });
+}
+
+// ── RENDER INFOGRAFIA ─────────────────────────────────────────────────────
+function renderInfografia() {
+  const depto = document.getElementById('infog-depto').value;
+  if (!depto) return;
+
+  document.getElementById('infog-placeholder').style.display = 'none';
+  const cont = document.getElementById('infog-content');
+  cont.style.display = 'block';
+
+  const dd = DD[depto];
+  if (!dd) return;
+
+  // Calculate derived metrics
+  const topMed = Object.entries(dd.meds)[0] || ['Sin dato', 0];
+  const topGrupo = Object.entries(dd.grupo)[0] || ['Sin dato', 0];
+  const topImpacto = Object.entries(dd.impacto)[0] || ['Sin dato', 0];
+  const topImpacto2 = Object.entries(dd.impacto)[1] || ['', 0];
+  const totalObtuvo = Object.values(dd.obtuvo).reduce((s,v)=>s+v,0);
+  const ilegalPct = dd.obtuvo['Mercado ilegal'] ? ((dd.obtuvo['Mercado ilegal']/totalObtuvo)*100).toFixed(1) : '0';
+  const totalFacil = Object.values(dd.facil).reduce((s,v)=>s+v,0);
+  const facilPct = dd.facil['SI'] ? ((dd.facil['SI']/totalFacil)*100).toFixed(1) : '0';
+  const hombresP = dd.sexo['HOMBRE'] ? ((dd.sexo['HOMBRE']/dd.total)*100).toFixed(0) : '0';
+  const topRazon = Object.entries(dd.razon)[0] || ['Sin dato', 0];
+  const topRegimen = Object.entries(dd.regimen)[0] || ['Sin dato', 0];
+
+  // Nivel de alerta
+  const nivelAlerta = parseFloat(ilegalPct) > 60 ? {label:'CRÍTICO', color:'#b83232', bg:'#fff0f0'} :
+                      parseFloat(ilegalPct) > 40 ? {label:'ALTO', color:'#c4920e', bg:'#fffbf0'} :
+                                                    {label:'MODERADO', color:'#2e7d5b', bg:'#f0fff7'};
+
+  // Tendencia (últimos 2 años disponibles)
+  const anosEntries = Object.entries(dd.anos).sort();
+  const tendencia = anosEntries.length >= 2 ?
+    (anosEntries[anosEntries.length-1][1] > anosEntries[anosEntries.length-2][1] ? '↑ Creciente' : '↓ Decreciente') : '—';
+
+  // Acciones IVC según grupos presentes
+  const gruposPresentes = Object.keys(dd.grupo).filter(g => dd.grupo[g] > 0);
+  const accionesHTML = gruposPresentes.map(g => {
+    const ivc = IVC_ACCIONES[g];
+    if (!ivc) return '';
+    return `
+      <div style="background:#fff;border-radius:8px;padding:16px 18px;margin-bottom:14px;
+                  border-left:5px solid ${ivc.color};box-shadow:0 2px 8px rgba(0,0,0,.07);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+          <div style="font-size:13px;font-weight:800;color:${ivc.color};">${g}</div>
+          <div style="background:${ivc.color};color:#fff;font-size:10px;font-weight:700;
+                      padding:3px 10px;border-radius:12px;">${ivc.alerta}</div>
+          <div style="font-size:11px;color:#555;">
+            ${dd.grupo[g]} casos — ${((dd.grupo[g]/dd.total)*100).toFixed(1)}% del total departamental
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:#333;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px;">
+          Acciones específicas para el FRE ${depto}:
+        </div>
+        <ol style="padding-left:18px;font-size:12px;color:#3d5c62;line-height:1.7;">
+          ${ivc.acciones.map(a=>`<li style="margin-bottom:6px;">${a}</li>`).join('')}
+        </ol>
+      </div>`;
+  }).join('');
+
+  // Medicamentos detail list
+  const medsList = Object.entries(dd.meds).map(([m,v],i) =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f4f5;font-size:12px;">
+      <div style="width:22px;height:22px;border-radius:50%;background:${['#006778','#00a3b5','#c4920e','#b83232','#2e7d5b','#7b1fa2'][i]};
+                  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;flex-shrink:0;">${i+1}</div>
+      <div style="flex:1;font-weight:600;">${m}</div>
+      <div style="font-weight:800;color:#006778;">${v}</div>
+      <div style="width:80px;background:#f0f4f5;border-radius:4px;height:7px;overflow:hidden;">
+        <div style="height:100%;background:#006778;width:${(v/Object.values(dd.meds)[0]*100).toFixed(0)}%;border-radius:4px;"></div>
+      </div>
+    </div>`).join('');
+
+  // Años trend mini
+  const anosVals = Object.entries(dd.anos).sort();
+  const maxAnio = Math.max(...anosVals.map(([,v])=>v));
+  const anosBars = anosVals.map(([a,v]) =>
+    `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+      <div style="font-size:9px;font-weight:700;color:#006778;">${v}</div>
+      <div style="width:100%;max-width:40px;height:${Math.max(4,(v/maxAnio*60)).toFixed(0)}px;
+                  background:#006778;border-radius:3px 3px 0 0;opacity:.8;"></div>
+      <div style="font-size:9px;color:#7fa8b0;">${a}</div>
+    </div>`).join('');
+
+  cont.innerHTML = `
+    <div id="infog-printable">
+    <!-- ENCABEZADO INSTITUCIONAL -->
+    <div style="background:var(--teal);padding:18px 22px;border-radius:10px 10px 0 0;
+                display:flex;align-items:center;gap:16px;margin-bottom:0;">
+      <div style="font-size:28px;">⚕</div>
+      <div style="flex:1;">
+        <div style="font-size:10px;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase;">
+          Fondo Nacional de Estupefacientes | Ministerio de Salud y Protección Social
+        </div>
+        <div style="font-size:16px;font-weight:800;color:#fff;margin-top:2px;">
+          HOJA DE RUTA — Fondo Rotatorio de Estupefacientes
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);margin-top:2px;font-weight:600;">
+          Departamento de ${depto} | Sistema de Vigilancia Epidemiológica Unidades Centinela 2022–2026
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="background:${nivelAlerta.bg};border:2px solid ${nivelAlerta.color};border-radius:8px;
+                    padding:6px 14px;font-size:12px;font-weight:800;color:${nivelAlerta.color};">
+          NIVEL: ${nivelAlerta.label}
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:6px;">Generado: ${new Date().toLocaleDateString('es-CO')}</div>
+      </div>
+    </div>
+
+    <!-- KPIs DEPARTAMENTALES -->
+    <div style="background:#f5f8f9;padding:16px 22px;border:1px solid #dce9eb;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
+        ${[
+          {n:dd.total,l:'Total casos',s:'notificados 2022–2026',c:'var(--teal)'},
+          {n:topMed[0],l:'Medicamento líder',s:`${topMed[1]} casos`,c:'#7b1fa2'},
+          {n:ilegalPct+'%',l:'Mercado ilegal',s:'canal de obtención',c:'#b83232'},
+          {n:facilPct+'%',l:'Acceso fácil',s:'reportaron facilidad',c:'#c4920e'},
+          {n:dd.edad_prom+'a',l:'Edad promedio',s:'al momento del reporte',c:'var(--teal)'},
+          {n:hombresP+'%',l:'Hombres',s:'distribución por sexo',c:'var(--teal-d)'},
+        ].map(k=>`
+          <div style="background:#fff;border-radius:8px;padding:12px 14px;border-left:4px solid ${k.c};box-shadow:0 1px 6px rgba(0,0,0,.07);">
+            <div style="font-size:22px;font-weight:800;color:${k.c};line-height:1;">${k.n}</div>
+            <div style="font-size:10px;font-weight:700;color:#3d5c62;text-transform:uppercase;letter-spacing:.3px;margin-top:3px;">${k.l}</div>
+            <div style="font-size:10px;color:#7fa8b0;">${k.s}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- GRID PRINCIPAL -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+      <!-- MEDICAMENTOS REPORTADOS -->
+      <div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.07);">
+        <div style="font-size:11px;font-weight:700;color:var(--teal-d);text-transform:uppercase;
+                    letter-spacing:.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #dce9eb;">
+          💊 Medicamentos con Mayor Reporte
+        </div>
+        ${medsList}
+      </div>
+
+      <!-- PERFIL + CONTEXTO -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <!-- Cómo obtiene -->
+        <div style="background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.07);">
+          <div style="font-size:11px;font-weight:700;color:var(--teal-d);text-transform:uppercase;
+                      letter-spacing:.5px;margin-bottom:10px;">🔍 Canal de Obtención</div>
+          ${Object.entries(dd.obtuvo).map(([k,v])=>`
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px;">
+              <div style="width:100px;flex-shrink:0;color:#3d5c62;font-weight:${k==='Mercado ilegal'?'700':'400'};
+                          color:${k==='Mercado ilegal'?'#b83232':'#3d5c62'}">${k}</div>
+              <div style="flex:1;background:#f0f4f5;border-radius:4px;height:8px;overflow:hidden;">
+                <div style="height:100%;background:${k==='Mercado ilegal'?'#b83232':'#006778'};
+                            width:${(v/totalObtuvo*100).toFixed(0)}%;border-radius:4px;"></div>
+              </div>
+              <div style="font-weight:700;font-size:11px;color:${k==='Mercado ilegal'?'#b83232':'#006778'};min-width:28px;text-align:right;">${v}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Perfil y tendencia -->
+        <div style="background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.07);">
+          <div style="font-size:11px;font-weight:700;color:var(--teal-d);text-transform:uppercase;
+                      letter-spacing:.5px;margin-bottom:10px;">📊 Perfil y Tendencia</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;font-size:11px;">
+            <div><span style="color:#7fa8b0;">Régimen:</span> <strong>${topRegimen[0]}</strong></div>
+            <div><span style="color:#7fa8b0;">Razón:</span> <strong>${topRazon[0]}</strong></div>
+            <div><span style="color:#7fa8b0;">Sustancia impacto:</span> <strong>${topImpacto[0]}</strong></div>
+            <div><span style="color:#7fa8b0;">Tendencia:</span> <strong style="color:${tendencia.includes('↑')?'#b83232':'#2e7d5b'}">${tendencia}</strong></div>
+          </div>
+          <!-- Mini bar chart por año -->
+          <div style="font-size:10px;color:#7fa8b0;margin-bottom:6px;">Casos por año:</div>
+          <div style="display:flex;align-items:flex-end;gap:4px;height:70px;padding:0 4px;">
+            ${anosBars}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANÁLISIS NARRATIVO -->
+    <div style="background:var(--teal-l);border:1px solid var(--teal-m);border-radius:10px;
+                padding:16px 20px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:800;color:var(--teal-d);margin-bottom:10px;
+                  display:flex;align-items:center;gap:8px;">
+        📝 Análisis Epidemiológico — ${depto}
+      </div>
+      <p style="font-size:12px;color:#1a2e32;line-height:1.8;">
+        El Fondo Rotatorio de Estupefacientes del departamento de <strong>${depto}</strong> registra 
+        <strong>${dd.total} casos</strong> de consumo problemático de medicamentos y sustancias fiscalizadas 
+        en el período 2022–2026. El medicamento con mayor reporte es <strong>${topMed[0]}</strong> con 
+        <strong>${topMed[1]} casos</strong>, perteneciente al grupo farmacológico 
+        <strong>${topGrupo[0]}</strong> (${((topGrupo[1]/dd.total)*100).toFixed(1)}% del total departamental).
+        La tendencia de notificación es <strong>${tendencia}</strong>
+        ${anosVals.length >= 2 ? `, con un aumento del ${((anosVals[anosVals.length-1][1]-anosVals[0][1])/Math.max(anosVals[0][1],1)*100).toFixed(0)}% entre ${anosVals[0][0]} y ${anosVals[anosVals.length-1][0]}` : ''}.
+      </p>
+      <p style="font-size:12px;color:#1a2e32;line-height:1.8;margin-top:8px;">
+        El <strong>${ilegalPct}%</strong> de los pacientes reportó haber obtenido el medicamento o 
+        sustancia a través del <strong>mercado ilegal</strong>, lo cual indica una brecha significativa 
+        en los procesos de control de la cadena de dispensación formal. El <strong>${facilPct}%</strong> 
+        manifestó que le fue fácil conseguir el medicamento, evidenciando una alta accesibilidad que 
+        requiere atención prioritaria en los procesos de IVC. La razón de consumo más frecuente es 
+        <strong>"${topRazon[0]}"</strong>, y la sustancia de mayor impacto referida por los pacientes es 
+        <strong>${topImpacto[0]}${topImpacto2[0] ? ` seguida de ${topImpacto2[0]}` : ''}</strong>.
+        El perfil sociodemográfico predominante corresponde a <strong>hombres (${hombresP}%)</strong> con 
+        edad promedio de <strong>${dd.edad_prom} años</strong>, afiliados al régimen 
+        <strong>${topRegimen[0].toLowerCase()}</strong>.
+      </p>
+    </div>
+
+    <!-- ACCIONES IVC -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:800;color:var(--teal-d);margin-bottom:12px;
+                  padding-bottom:8px;border-bottom:2px solid #dce9eb;display:flex;align-items:center;gap:8px;">
+        🎯 Plan de Acción IVC para el FRE ${depto}
+      </div>
+      <p style="font-size:11px;color:#7fa8b0;margin-bottom:12px;line-height:1.5;">
+        Las siguientes acciones se generan con base en los grupos farmacológicos identificados con mayor 
+        reporte de consumo problemático en el departamento. Deben ejecutarse en el marco de las competencias 
+        establecidas en la Resolución 1479 de 2006 y los lineamientos del FNE.
+      </p>
+      ${accionesHTML || '<p style="font-size:12px;color:#7fa8b0;">No se encontraron grupos farmacológicos con acciones definidas para este departamento.</p>'}
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <div style="background:#f5f8f9;border-radius:0 0 10px 10px;padding:12px 22px;
+                border-top:1px solid #dce9eb;display:flex;justify-content:space-between;
+                align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:10px;color:#7fa8b0;">
+        Fondo Nacional de Estupefacientes | Ministerio de Salud y Protección Social
+      </div>
+      <div style="font-size:10px;color:#7fa8b0;">
+        Sistema Vigilancia Epidemiológica — Unidades Centinela | ${new Date().toLocaleDateString('es-CO')}
+      </div>
+      <div style="font-size:10px;color:#7fa8b0;">
+        Resolución 1479/2006 — Uso exclusivo institucional
+      </div>
+    </div>
+    </div><!-- /infog-printable -->
+  `;
+
+  // Notify charts to not re-render this page
+}
+
+// ── PDF DOWNLOAD ──────────────────────────────────────────────────────────
+function downloadPDF() {
+  const depto = document.getElementById('infog-depto').value;
+  if (!depto) { alert('Seleccione un departamento primero'); return; }
+
+  // Use browser print to PDF
+  const content = document.getElementById('infog-printable');
+  if (!content) { alert('Genere el informe primero seleccionando un departamento'); return; }
+
+  const printWindow = window.open('','_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html><html lang="es"><head>
+    <meta charset="UTF-8">
+    <title>Hoja de Ruta FRE - ${depto}</title>
+    <style>
+      * { box-sizing:border-box; margin:0; padding:0; }
+      body { font-family:'Segoe UI',Arial,sans-serif; padding:20px; color:#1a2e32; }
+      :root {
+        --teal:#006778; --teal-d:#004d5c; --teal-l:#e8f5f7; --teal-m:#b2dde4;
+        --grey1:#f5f8f9;
+      }
+      @page { size:A4; margin:15mm; }
+      @media print { body { padding:0; } }
+    </style>
+    </head><body>
+    ${content.innerHTML}
+    <script>window.onload=function(){window.print();window.close();}<\/script>
+    </body></html>`);
+  printWindow.document.close();
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+initFilters();
+initInfografia();
+render();
+</script>
+</body>
+</html>
